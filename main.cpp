@@ -3,6 +3,8 @@
 #include <iostream>
 #include "GameManager.h"
 
+//platformer
+
 SDL_Window *gWindow;
 SDL_Renderer *gRenderer;
 
