@@ -14,6 +14,8 @@ class GameManager
 		
 		void loadCharacters(char *playerName, char *fileName, int playerX, int playerY, int charNum);
 	
+		void characterJump(std::shared_ptr<Character> chr, bool isPlayer);
+	
 		void Start();
 	
 		std::vector<std::shared_ptr<Character>> characters;
@@ -23,6 +25,8 @@ class GameManager
 	private:
 		
 		bool checkCollision(std::shared_ptr<Character>chr, bool player);
+		
+		void gravity(int value);
 		
 		int cameraX;
 		int cameraY;

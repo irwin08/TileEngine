@@ -22,6 +22,12 @@ class Character
 		int cameraCY;
 		
 		std::string name;
+		
+		void jump(int value);
+		
+		bool jumping;
+		int jumpingInterval;
+		int jumpValue;
 	
 	protected:
 	

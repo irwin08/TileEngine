@@ -17,13 +17,15 @@ void GameManager::Start()
 {
 	SDL_Event e;
 	
+	int playerJumpValue = 15;
+	
 	while(!quit)
 	{
 		while(SDL_PollEvent(&e) != 0)
 		{
-		if(e.type == SDL_QUIT)
+			if(e.type == SDL_QUIT)
 				quit = 1;
-			else if(e.type == SDL_KEYDOWN)
+			/*else if(e.type == SDL_KEYDOWN)
 			{
 				switch(e.key.keysym.sym)
 				{
@@ -47,16 +49,42 @@ void GameManager::Start()
 						if(checkCollision(player, true))
 							player->moveLeft(&cameraX, &cameraY);
 						break;
+					case SDLK_SPACE:
+						player->jump(15);
+						break;
 				}
-			}
+			}*/
 		}
 		
+		const Uint8 *currentKeyStates = SDL_GetKeyboardState(NULL);
+		
+		if(currentKeyStates[SDL_SCANCODE_A])
+		{
+			player->moveLeft(&cameraX, &cameraY);
+			if(checkCollision(player, true))
+				player->moveRight(&cameraX, &cameraY, 200);
+		}
+		if(currentKeyStates[SDL_SCANCODE_D])
+		{
+			player->moveRight(&cameraX, &cameraY, 200);
+			if(checkCollision(player, true))
+				player->moveLeft(&cameraX, &cameraY);
+		}
+		if(currentKeyStates[SDL_SCANCODE_SPACE])
+		{
+			player->jump(15);
+		}
+		
+		//make characters jump
+		characterJump(player, true);
+		gravity(9);
 		
 		SDL_SetRenderDrawColor(mRenderer, 0x00, 0x00, 0x00, 0x00);
 		SDL_RenderClear(mRenderer);
 		
 		map->render(mRenderer, cameraX, cameraY);
 		player->render();
+			
 		
 		for(int i = 0; i < mCharNum; i++)
 		{
@@ -159,4 +187,47 @@ bool GameManager::checkCollision(std::shared_ptr<Character>chr, bool player)
 	}
 	
 	return colliding;
+}
+
+
+void GameManager::gravity(int value)
+{
+	for(int i = 0; i < mCharNum; i++)
+	{
+		characters[i]->mY += value;
+		if(checkCollision(characters[i], false))
+		{
+			characters[i]->mY -= value;
+		}
+	}
+	
+	player->mY += value;
+	if(checkCollision(player, true))
+	{
+		player->mY -= value;
+	}
+}
+
+void GameManager::characterJump(std::shared_ptr<Character> chr, bool isPlayer)
+{
+	if(chr->jumping)
+	{
+		if(chr->jumpingInterval < 15)
+		{
+			chr->mY -= chr->jumpValue;
+			
+			if(checkCollision(chr, isPlayer))
+			{
+				chr->mY += chr->jumpValue;
+			}
+			
+			
+			chr->jumpingInterval++;
+		}
+		else
+		{
+			chr->jumpingInterval = 0;
+			chr->jumping = false;
+		}
+	}
 }

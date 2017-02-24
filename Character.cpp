@@ -7,6 +7,10 @@ Character::Character(const char *path, SDL_Renderer *renderer)
 	cameraCY = 0;
 	mRenderer = renderer;
 	loadTexture(path);
+	
+	jumping = false;
+	jumpingInterval = 0;
+	jumpValue = 15;
 }
 
 void Character::loadTexture(const char *path)
@@ -22,7 +26,7 @@ void Character::loadTexture(const char *path)
 }
 
 void Character::render()
-{
+{	
 	SDL_Rect rect;
 	rect.x = mX - cameraCX;
 	rect.y = mY - cameraCY;
@@ -52,6 +56,12 @@ void Character::moveDown()
 	mY += 5;
 }
 
+
+void Character::jump(int value)
+{
+	jumping = true;
+	jumpValue = value;
+}
 
 		
 		
