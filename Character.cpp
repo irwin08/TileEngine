@@ -10,7 +10,9 @@ Character::Character(const char *path, SDL_Renderer *renderer)
 	
 	jumping = false;
 	jumpingInterval = 0;
-	jumpValue = 15;
+	jumpValue = 1;
+	
+	correctValue = 0;
 }
 
 void Character::loadTexture(const char *path)
@@ -30,8 +32,8 @@ void Character::render()
 	SDL_Rect rect;
 	rect.x = mX - cameraCX;
 	rect.y = mY - cameraCY;
-	rect.w = 30;
-	rect.h = 50;
+	rect.w = 20;
+	rect.h = 40;
 
 	SDL_RenderCopy(mRenderer, mTexture, NULL, &rect);
 }

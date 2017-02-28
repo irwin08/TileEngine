@@ -4,7 +4,7 @@
 
 Player::Player(char *path, SDL_Renderer *renderer) : Character(path, renderer)
 {
-
+	name = "Player";
 }
 
 void Player::moveUp(int *cameraX, int *cameraY)

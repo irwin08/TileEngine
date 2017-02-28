@@ -4,6 +4,7 @@
 #include <sstream>
 #include <fstream>
 #include <cstdlib>
+#include "Timer.h"
 
 GameManager::GameManager(SDL_Renderer *renderer)
 {
@@ -19,8 +20,15 @@ void GameManager::Start()
 	
 	int playerJumpValue = 15;
 	
+	const int FRAMES_PER_SECOND = 45;
+	
+	int frame = 0;
+	bool cap = true;
+	Timer fps;
+	
 	while(!quit)
 	{
+		fps.start();
 		while(SDL_PollEvent(&e) != 0)
 		{
 			if(e.type == SDL_QUIT)
@@ -94,6 +102,15 @@ void GameManager::Start()
 		}
 
 		SDL_RenderPresent(mRenderer);
+		
+		
+		frame++;
+		
+		if((cap == true) && (fps.get_ticks() < 1000 / FRAMES_PER_SECOND))
+		{
+			SDL_Delay((1000 / FRAMES_PER_SECOND) - fps.get_ticks());
+		}
+		
 	}
 }
 
@@ -157,18 +174,20 @@ bool GameManager::checkCollision(std::shared_ptr<Character>chr, bool player)
 	{
 		if(player)
 		{
-			if((chr->mX + cameraX) < (characters[i]->mX + 30) && (chr->mX + cameraX + 30) > characters[i]->mX)
+			if((chr->mX + cameraX) < (characters[i]->mX + 20) && (chr->mX + cameraX + 20) > characters[i]->mX)
 			{
-				if((chr->mY + cameraY) < (characters[i]->mY + 50) && (chr->mY + cameraY + 50) > characters[i]->mY)
+				if((chr->mY + cameraY) < (characters[i]->mY + 40) && (chr->mY + cameraY + 40) > characters[i]->mY)
 					colliding = true;
 			}
 		}
 		else
 		{
-			if(chr->mX < (characters[i]->mX + 30) && (chr->mX + 30) > characters[i]->mX)
+			if(chr->mX < (characters[i]->mX + 20) && (chr->mX + 20) > characters[i]->mX && chr->name != characters[i]->name)
 			{
-				if(chr->mY < (characters[i]->mY + 50) && (chr->mY + 50) > characters[i]->mY)
+				if(chr->mY < (characters[i]->mY + 40) && (chr->mY + 40) > characters[i]->mY)
+				{
 					colliding = true;
+				}
 			}
 		}
 	}
@@ -177,13 +196,17 @@ bool GameManager::checkCollision(std::shared_ptr<Character>chr, bool player)
 	
 	if(player)
 	{
-		if(map->isColliding(((chr->mX + cameraX)/20), ((chr->mY + cameraY + 45)/20)) || map->isColliding(((chr->mX + cameraX + 25)/20), ((chr->mY + cameraY + 45)/20)))
+		if(map->isColliding(((chr->mX + 1 + cameraX)/20), ((chr->mY + 1 + cameraY)/20)) || map->isColliding(((chr->mX + 19 + cameraX)/20), ((chr->mY + 1 + cameraY)/20)) || map->isColliding(((chr->mX + 1 + cameraX)/20), ((chr->mY + 39 + cameraY)/20)) || map->isColliding(((chr->mX + 19 + cameraX)/20), ((chr->mY + 39 + cameraY)/20)))
+		{	
 			colliding = true;
+		}
 	}
 	else
 	{
-		if(map->isColliding(((chr->mX)/20), ((chr->mY)/20)))
+		if(map->isColliding(((chr->mX + 1)/20), ((chr->mY + 1)/20)) || map->isColliding(((chr->mX + 19)/20), ((chr->mY + 1)/20)) || map->isColliding(((chr->mX + 1)/20), ((chr->mY + 39)/20)) || map->isColliding(((chr->mX + 19)/20), ((chr->mY + 39)/20)))
+		{
 			colliding = true;
+		}
 	}
 	
 	return colliding;
@@ -194,17 +217,25 @@ void GameManager::gravity(int value)
 {
 	for(int i = 0; i < mCharNum; i++)
 	{
-		characters[i]->mY += value;
-		if(checkCollision(characters[i], false))
+		for(int j = 0; j < value; j++)
 		{
-			characters[i]->mY -= value;
+			characters[i]->mY++;
+			if(checkCollision(characters[i], false))
+			{
+				characters[i]->mY--;
+				break;
+			}
 		}
 	}
 	
-	player->mY += value;
-	if(checkCollision(player, true))
+	for(int i = 0; i < value; i++)
 	{
-		player->mY -= value;
+		player->mY++;
+		if(checkCollision(player, true))
+		{
+			player->mY--;
+			break;
+		}
 	}
 }
 
@@ -214,12 +245,18 @@ void GameManager::characterJump(std::shared_ptr<Character> chr, bool isPlayer)
 	{
 		if(chr->jumpingInterval < 15)
 		{
-			chr->mY -= chr->jumpValue;
-			
-			if(checkCollision(chr, isPlayer))
+			for(int i = 0; i < chr->jumpValue; i++)
 			{
-				chr->mY += chr->jumpValue;
+				chr->mY--;
+				if(checkCollision(chr, isPlayer))
+				{
+					chr->mY++;
+					chr->jumpingInterval = 15;
+					break;
+				}
 			}
+			
+			
 			
 			
 			chr->jumpingInterval++;

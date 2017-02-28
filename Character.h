@@ -29,6 +29,8 @@ class Character
 		int jumpingInterval;
 		int jumpValue;
 	
+		int correctValue;
+	
 	protected:
 	
 		//will need to implement sprite walking animations later, this is for that.
