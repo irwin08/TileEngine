@@ -26,6 +26,8 @@ void GameManager::Start()
 	bool cap = true;
 	Timer fps;
 	
+	bool spacebar = false;
+	
 	while(!quit)
 	{
 		fps.start();
@@ -80,12 +82,22 @@ void GameManager::Start()
 		}
 		if(currentKeyStates[SDL_SCANCODE_SPACE])
 		{
-			player->jump(15);
+			spacebar = true;
+		}
+		if(!currentKeyStates[SDL_SCANCODE_SPACE] && spacebar)
+		{
+			if(player->jumpCount < 2)
+			{
+				player->jump(15);
+				player->jumpCount++;
+			}
+			spacebar = false;
 		}
 		
 		//make characters jump
-		characterJump(player, true);
+		
 		gravity(9);
+		characterJump(player, true);
 		
 		SDL_SetRenderDrawColor(mRenderer, 0x00, 0x00, 0x00, 0x00);
 		SDL_RenderClear(mRenderer);
@@ -196,14 +208,14 @@ bool GameManager::checkCollision(std::shared_ptr<Character>chr, bool player)
 	
 	if(player)
 	{
-		if(map->isColliding(((chr->mX + 1 + cameraX)/20), ((chr->mY + 1 + cameraY)/20)) || map->isColliding(((chr->mX + 19 + cameraX)/20), ((chr->mY + 1 + cameraY)/20)) || map->isColliding(((chr->mX + 1 + cameraX)/20), ((chr->mY + 39 + cameraY)/20)) || map->isColliding(((chr->mX + 19 + cameraX)/20), ((chr->mY + 39 + cameraY)/20)))
+		if(map->isColliding(((chr->mX + 1 + cameraX)/20), ((chr->mY + 1 + cameraY)/20)) || map->isColliding(((chr->mX + 19 + cameraX)/20), ((chr->mY + 1 + cameraY)/20)) || map->isColliding(((chr->mX + 1 + cameraX)/20), ((chr->mY + 39 + cameraY)/20)) || map->isColliding(((chr->mX + 19 + cameraX)/20), ((chr->mY + 39 + cameraY)/20)) || map->isColliding((chr->mX + 19 + cameraX), ((chr->mY + 19 + cameraY)) || map->isColliding((chr->mX + cameraX), ((chr->mY + 19 + cameraY)))) || map->isColliding((chr->mX + 19 + cameraX), ((chr->mY + 21 + cameraY)) || map->isColliding((chr->mX + cameraX), ((chr->mY + 21 + cameraY)))))
 		{	
 			colliding = true;
 		}
 	}
 	else
 	{
-		if(map->isColliding(((chr->mX + 1)/20), ((chr->mY + 1)/20)) || map->isColliding(((chr->mX + 19)/20), ((chr->mY + 1)/20)) || map->isColliding(((chr->mX + 1)/20), ((chr->mY + 39)/20)) || map->isColliding(((chr->mX + 19)/20), ((chr->mY + 39)/20)))
+		if(map->isColliding(((chr->mX + 1)/20), ((chr->mY + 1)/20)) || map->isColliding(((chr->mX + 19)/20), ((chr->mY + 1)/20)) || map->isColliding(((chr->mX + 1)/20), ((chr->mY + 39)/20)) || map->isColliding(((chr->mX + 19)/20), ((chr->mY + 39)/20)) || map->isColliding((chr->mX + 19), ((chr->mY + 19)) || map->isColliding((chr->mX), ((chr->mY + 19)))))
 		{
 			colliding = true;
 		}
@@ -234,6 +246,7 @@ void GameManager::gravity(int value)
 		if(checkCollision(player, true))
 		{
 			player->mY--;
+			player->jumpCount = 0;
 			break;
 		}
 	}
