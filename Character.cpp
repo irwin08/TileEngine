@@ -12,8 +12,6 @@ Character::Character(const char *path, SDL_Renderer *renderer)
 	jumpingInterval = 0;
 	jumpValue = 1;
 	
-	jumpCount = 0;
-	
 	correctValue = 0;
 }
 

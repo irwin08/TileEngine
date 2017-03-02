@@ -29,9 +29,6 @@ class Character
 		int jumpingInterval;
 		int jumpValue;
 	
-		//test to see if doublejump has been used.
-		int jumpCount;
-	
 		int correctValue;
 	
 	protected:
