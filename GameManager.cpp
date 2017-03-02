@@ -84,8 +84,9 @@ void GameManager::Start()
 		}
 		
 		//make characters jump
-		characterJump(player, true);
 		gravity(9);
+		characterJump(player, true);
+	
 		
 		SDL_SetRenderDrawColor(mRenderer, 0x00, 0x00, 0x00, 0x00);
 		SDL_RenderClear(mRenderer);
