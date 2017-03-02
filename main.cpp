@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 	init();
 	
 	GameManager *gameManager = new GameManager(gRenderer);
-	gameManager->loadMap("maps/platformer.map", 100, 25);
+	gameManager->loadMap("maps/flappybird.map", 2000, 25);
 	gameManager->loadCharacters("characters/associate.bmp", "characters/walmart.char", 0, 0, 1);
 	gameManager->Start();
 	
