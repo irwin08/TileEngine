@@ -4,6 +4,7 @@
 #include <sstream>
 #include <fstream>
 #include <cstdlib>
+#include <ctime>
 #include "Timer.h"
 
 GameManager::GameManager(SDL_Renderer *renderer)
@@ -12,6 +13,9 @@ GameManager::GameManager(SDL_Renderer *renderer)
 	cameraY = 0;
 	mRenderer = renderer;
 	quit = 0;
+	distance = 0;
+	noUpdate = 0;
+	lastCheck = 0;
 }
 
 void GameManager::Start()
@@ -26,61 +30,103 @@ void GameManager::Start()
 	bool cap = true;
 	Timer fps;
 	
+	bool pause = false;
+	
+	bool pKey = false;
+	
+	srand(time(NULL));
+	
 	while(!quit)
 	{
+
 		fps.start();
-		while(SDL_PollEvent(&e) != 0)
+		do
 		{
-			if(e.type == SDL_QUIT)
-				quit = 1;
-			/*else if(e.type == SDL_KEYDOWN)
+			while(SDL_PollEvent(&e) != 0)
 			{
-				switch(e.key.keysym.sym)
+				if(e.type == SDL_QUIT)
+					quit = 1;
+				/*else if(e.type == SDL_KEYDOWN)
 				{
-					case SDLK_w:
-						player->moveUp(&cameraX, &cameraY);
-						if(checkCollision(player, true))
-							player->moveDown(&cameraX, &cameraY, 200);
-						break;
-					case SDLK_s:
-						player->moveDown(&cameraX, &cameraY, 200);
-						if(checkCollision(player, true))
+					switch(e.key.keysym.sym)
+					{
+						case SDLK_w:
 							player->moveUp(&cameraX, &cameraY);
-						break;
-					case SDLK_a:
-						player->moveLeft(&cameraX, &cameraY);
-						if(checkCollision(player, true))
-							player->moveRight(&cameraX, &cameraY, 200);
-						break;
-					case SDLK_d:
-						player->moveRight(&cameraX, &cameraY, 200);
-						if(checkCollision(player, true))
+							if(checkCollision(player, true))
+								player->moveDown(&cameraX, &cameraY, 200);
+							break;
+						case SDLK_s:
+							player->moveDown(&cameraX, &cameraY, 200);
+							if(checkCollision(player, true))
+								player->moveUp(&cameraX, &cameraY);
+							break;
+						case SDLK_a:
 							player->moveLeft(&cameraX, &cameraY);
-						break;
-					case SDLK_SPACE:
-						player->jump(15);
-						break;
-				}
-			}*/
-		}
+							if(checkCollision(player, true))
+								player->moveRight(&cameraX, &cameraY, 200);
+							break;
+						case SDLK_d:
+							player->moveRight(&cameraX, &cameraY, 200);
+							if(checkCollision(player, true))
+								player->moveLeft(&cameraX, &cameraY);
+							break;
+						case SDLK_SPACE:
+							player->jump(15);
+							break;
+					}
+				}*/
+			}
 		
-		const Uint8 *currentKeyStates = SDL_GetKeyboardState(NULL);
 		
-		if(currentKeyStates[SDL_SCANCODE_A])
-		{
-			player->moveLeft(&cameraX, &cameraY);
-			if(checkCollision(player, true))
+		
+			const Uint8 *currentKeyStates = SDL_GetKeyboardState(NULL);
+			
+			/*if(currentKeyStates[SDL_SCANCODE_A])
+			{
+				player->moveLeft(&cameraX, &cameraY);
+				if(checkCollision(player, true))
+					player->moveRight(&cameraX, &cameraY, 200);
+			}
+			if(currentKeyStates[SDL_SCANCODE_D])
+			{
 				player->moveRight(&cameraX, &cameraY, 200);
-		}
-		if(currentKeyStates[SDL_SCANCODE_D])
+				if(checkCollision(player, true))
+					player->moveLeft(&cameraX, &cameraY);
+			}*/
+			if(currentKeyStates[SDL_SCANCODE_SPACE])
+			{
+				player->jump(15);
+			}
+			if(currentKeyStates[SDL_SCANCODE_P])
+			{
+				std::cout << pause << std::endl;
+				pKey = true;
+			}
+			if(!currentKeyStates[SDL_SCANCODE_P] && pKey)
+			{
+				pause = !pause;
+				if(pause == true)
+					fps.pause();
+				else
+					fps.unpause();
+				pKey = false;
+			}
+			
+			if(quit)
+				break;
+		}while(pause);
+		
+		
+		//force player right at v=1px/frame
+		for(int i = 0; i < 3; i++)
 		{
 			player->moveRight(&cameraX, &cameraY, 200);
 			if(checkCollision(player, true))
+			{
 				player->moveLeft(&cameraX, &cameraY);
-		}
-		if(currentKeyStates[SDL_SCANCODE_SPACE])
-		{
-			player->jump(15);
+				break;
+			}
+			distance++;
 		}
 		
 		//make characters jump
@@ -90,6 +136,12 @@ void GameManager::Start()
 		
 		SDL_SetRenderDrawColor(mRenderer, 0x00, 0x00, 0x00, 0x00);
 		SDL_RenderClear(mRenderer);
+		
+		std::cout << cameraX << std::endl;
+		
+		//3760 is just a magic number for the end of the map
+		if(cameraX > 3760)
+			cameraX = 0;
 		
 		map->render(mRenderer, cameraX, cameraY);
 		player->render();
@@ -105,6 +157,61 @@ void GameManager::Start()
 		SDL_RenderPresent(mRenderer);
 		
 		
+		//update map
+		
+		//check to see if part of the map is offscreen so we can edit it
+		if((distance - 500) > 0)
+		{
+			int i;
+			if((((cameraX+200)/20)-20) < 0)
+				i = 0;
+			else
+				i = (((cameraX+200)/20)-20);
+			for(; i < (((cameraX+200)/20)-19); i++)
+			{
+				for(int j = 0; j < 25; j++)
+				{
+					if(!(map->getTileType(i, j) == 3))
+						map->changeTileType(3, i, j);
+				}
+				noUpdate++;
+			}
+			
+			if((distance - lastCheck) > 600)
+			{
+				lastCheck = distance;
+				noUpdate = 0;
+				
+				int collumn = rand() % 5 + (((cameraX+200)/20)-25);
+				
+				int holeWidth = ((rand() % 10000 + 1000)/(cameraX+200))/20;
+				
+				if(holeWidth < 5)
+					holeWidth = 5;
+				if(holeWidth > 15)
+					holeWidth = 15;
+				
+				int start = rand() % 25 - holeWidth;
+				if(start < 0)
+					start = 0;
+				
+				for(int k = 0; k < 25; k++)
+				{
+					map->changeTileType(4, collumn, k);
+				}
+				
+				for(int k = 0; k < holeWidth; k++)
+				{
+					//std::cout << collumn << " " << start << std::endl;
+					map->changeTileType(3, collumn, start);
+					start++;
+				}
+				
+			}
+		}
+		
+		
+		
 		frame++;
 		
 		if((cap == true) && (fps.get_ticks() < 1000 / FRAMES_PER_SECOND))
@@ -117,7 +224,7 @@ void GameManager::Start()
 
 void GameManager::loadMap(char *fileName, int x, int y)
 {
-	map.reset(new Map(mRenderer, x, y, fileName));
+	map.reset(new Map(mRenderer, x, y, fileName, true));
 }
 
 void GameManager::loadCharacters(char *playerName, char *fileName, int playerX, int playerY, int charNum)

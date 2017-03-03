@@ -31,9 +31,15 @@ class GameManager
 		int cameraX;
 		int cameraY;
 		
+		int distance;
+		
+		int lastCheck;
+		
 		bool quit;
 		
 		int mCharNum;
 		
 		SDL_Renderer *mRenderer;
+		
+		int noUpdate;
 };

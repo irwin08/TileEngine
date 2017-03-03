@@ -36,11 +36,11 @@ void Player::moveRight(int *cameraX, int *cameraY, int width)
 	//width = 200 for now
 	if(mX < width)
 	{
-		mX += 5;
+		mX += 1;
 	}
 	else
 	{
-		*cameraX += 5;
+		*cameraX += 1;
 	}
 }
 

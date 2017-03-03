@@ -14,7 +14,7 @@ int cameraY = 0;
 void init()
 {
 	SDL_Init(SDL_INIT_VIDEO);
-	gWindow = SDL_CreateWindow("Tiles", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 500, 500, SDL_WINDOW_SHOWN);
+	gWindow = SDL_CreateWindow("Copter", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 500, 500, SDL_WINDOW_SHOWN);
 	gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 }
 
@@ -35,8 +35,8 @@ int main(int argc, char *argv[])
 	init();
 	
 	GameManager *gameManager = new GameManager(gRenderer);
-	gameManager->loadMap("maps/flappybird.map", 2000, 25);
-	gameManager->loadCharacters("characters/associate.bmp", "characters/walmart.char", 0, 0, 1);
+	gameManager->loadMap("maps/copter.map", 200, 25);
+	gameManager->loadCharacters("characters/associate.bmp", "characters/copter.char", 0, 0, 0);
 	gameManager->Start();
 	
 	return 0;
