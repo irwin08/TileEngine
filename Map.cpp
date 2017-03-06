@@ -63,6 +63,34 @@ void Map::render(SDL_Renderer *gRenderer, int x, int y)
 	}
 }
 
+void Map::renderOffset(SDL_Renderer *gRenderer, int x, int y, int m, int n)
+{
+	/*if(x < 0)
+		x = 0;
+	else if(x > mX)
+		x = mX;
+	if(y < 0)
+		y = 0;
+	else if(y > mY)
+		y = 0;*/
+	//since camerax and cameray are incrementing by 5, we have to divide by 5
+	
+	//topLeftX = x/20
+	
+	int k = 0;
+	for(int i = k; i < mY; i++)
+	{
+		int l = 0;
+		for(int j = l; j < mX; j++)
+		{
+			//to keep the proportions we must multiply x by 4 because x is going up by 5
+			tiles[i][j]->render(gRenderer, ((j*20) - (x) + m), ((i*20) - (y) + n));
+		}
+		
+	}
+}
+
+
 void Map::loadMap(const char *filePath, SDL_Renderer *gRenderer)
 {
 	int y = 0;

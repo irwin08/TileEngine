@@ -16,6 +16,7 @@ GameManager::GameManager(SDL_Renderer *renderer)
 	distance = 0;
 	noUpdate = 0;
 	lastCheck = 0;
+	dead = false;
 }
 
 void GameManager::Start()
@@ -40,6 +41,7 @@ void GameManager::Start()
 	{
 
 		fps.start();
+		
 		do
 		{
 			while(SDL_PollEvent(&e) != 0)
@@ -117,6 +119,7 @@ void GameManager::Start()
 		}while(pause);
 		
 		
+		
 		//force player right at v=1px/frame
 		for(int i = 0; i < 3; i++)
 		{
@@ -133,17 +136,32 @@ void GameManager::Start()
 		gravity(9);
 		characterJump(player, true);
 	
+		if(dead)
+		{
+			std::cout << "Game over" << std::endl;
+			break;
+		}
 		
 		SDL_SetRenderDrawColor(mRenderer, 0x00, 0x00, 0x00, 0x00);
 		SDL_RenderClear(mRenderer);
 		
 		std::cout << cameraX << std::endl;
 		
-		//3760 is just a magic number for the end of the map
-		if(cameraX > 3760)
-			cameraX = 0;
-		
 		map->render(mRenderer, cameraX, cameraY);
+		
+		//3760 is just a magic number for the end of the map
+		if(cameraX > (4000 - 500))
+		{
+			int i = (cameraX - (4000 - 500));
+			map->renderOffset(mRenderer, cameraX, cameraY, (500 - i), 0);
+		}
+		
+		if(cameraX > 3760)
+		{
+			cameraX = 0;
+			(player->cameraCX) = 0;
+		}
+		
 		player->render();
 			
 		
@@ -177,7 +195,7 @@ void GameManager::Start()
 				noUpdate++;
 			}
 			
-			if((distance - lastCheck) > 600)
+			if((distance - lastCheck) > 500)
 			{
 				lastCheck = distance;
 				noUpdate = 0;
@@ -327,8 +345,11 @@ void GameManager::gravity(int value)
 	{
 		for(int j = 0; j < value; j++)
 		{
+			
 			characters[i]->mY++;
-			if(checkCollision(characters[i], false))
+			if(characters[i]->mY < 0 || characters[i]->mY > 460)
+				dead = true;
+			else if(checkCollision(characters[i], false))
 			{
 				characters[i]->mY--;
 				break;
@@ -339,7 +360,9 @@ void GameManager::gravity(int value)
 	for(int i = 0; i < value; i++)
 	{
 		player->mY++;
-		if(checkCollision(player, true))
+		if(player->mY < 0 || player->mY > 460)
+				dead = true;
+		else if(checkCollision(player, true))
 		{
 			player->mY--;
 			break;
@@ -356,6 +379,11 @@ void GameManager::characterJump(std::shared_ptr<Character> chr, bool isPlayer)
 			for(int i = 0; i < chr->jumpValue; i++)
 			{
 				chr->mY--;
+				if(player->mY < 0 || player->mY > 500)
+				{	
+					dead = true;
+					break;
+				}
 				if(checkCollision(chr, isPlayer))
 				{
 					chr->mY++;

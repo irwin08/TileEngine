@@ -37,6 +37,8 @@ class GameManager
 		
 		bool quit;
 		
+		bool dead;
+		
 		int mCharNum;
 		
 		SDL_Renderer *mRenderer;

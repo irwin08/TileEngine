@@ -15,6 +15,7 @@ class Map
 		Map(SDL_Renderer *gRenderer, int x, int y, const char *filePath, bool edit=false, bool newMap=false);
 		
 		void render(SDL_Renderer *gRenderer, int x=0, int y=0);
+		void renderOffset(SDL_Renderer *gRenderer, int x=0, int y=0, int m=0, int n=0);
 		
 		void loadMap(const char *filePath, SDL_Renderer *gRenderer);
 		
