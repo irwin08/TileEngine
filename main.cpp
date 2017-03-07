@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
 	
 	GameManager *gameManager = new GameManager(gRenderer);
 	gameManager->loadMap("maps/copter.map", 200, 25);
-	gameManager->loadCharacters("characters/associate.bmp", "characters/copter.char", 0, 0, 0);
+	gameManager->loadCharacters("characters/copter.bmp", "characters/copter.char", 0, 0, 0);
 	gameManager->Start();
 	
 	return 0;

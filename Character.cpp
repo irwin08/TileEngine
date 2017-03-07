@@ -12,6 +12,9 @@ Character::Character(const char *path, SDL_Renderer *renderer)
 	jumpingInterval = 0;
 	jumpValue = 1;
 	
+	w = 40;
+	h = 20;
+	
 	correctValue = 0;
 }
 
@@ -19,6 +22,9 @@ void Character::loadTexture(const char *path)
 {
 	SDL_Texture *newTexture = NULL;
 	SDL_Surface *surface = SDL_LoadBMP(path);
+	
+	
+	SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 0xFF, 0xFF, 0xFF));
 	
 	newTexture = SDL_CreateTextureFromSurface(mRenderer, surface);
 	
@@ -32,8 +38,8 @@ void Character::render()
 	SDL_Rect rect;
 	rect.x = mX - cameraCX;
 	rect.y = mY - cameraCY;
-	rect.w = 20;
-	rect.h = 40;
+	rect.w = w;
+	rect.h = h;
 
 	SDL_RenderCopy(mRenderer, mTexture, NULL, &rect);
 }

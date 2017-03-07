@@ -18,6 +18,9 @@ class Character
 		int mX;
 		int mY;
 		
+		int w;
+		int h;
+		
 		int cameraCX;
 		int cameraCY;
 		

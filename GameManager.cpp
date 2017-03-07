@@ -308,9 +308,9 @@ bool GameManager::checkCollision(std::shared_ptr<Character>chr, bool player)
 		}
 		else
 		{
-			if(chr->mX < (characters[i]->mX + 20) && (chr->mX + 20) > characters[i]->mX && chr->name != characters[i]->name)
+			if(chr->mX < (characters[i]->mX + characters[i]->w) && (chr->mX + characters[i]->w) > characters[i]->mX && chr->name != characters[i]->name)
 			{
-				if(chr->mY < (characters[i]->mY + 40) && (chr->mY + 40) > characters[i]->mY)
+				if(chr->mY < (characters[i]->mY + characters[i]->h) && (chr->mY + characters[i]->h) > characters[i]->mY)
 				{
 					colliding = true;
 				}
@@ -322,14 +322,14 @@ bool GameManager::checkCollision(std::shared_ptr<Character>chr, bool player)
 	
 	if(player)
 	{
-		if(map->isColliding(((chr->mX + 1 + cameraX)/20), ((chr->mY + 1 + cameraY)/20)) || map->isColliding(((chr->mX + 19 + cameraX)/20), ((chr->mY + 1 + cameraY)/20)) || map->isColliding(((chr->mX + 1 + cameraX)/20), ((chr->mY + 39 + cameraY)/20)) || map->isColliding(((chr->mX + 19 + cameraX)/20), ((chr->mY + 39 + cameraY)/20)))
+		if(map->isColliding(((chr->mX + 1 + cameraX)/20), ((chr->mY + 1 + cameraY)/20)) || map->isColliding(((chr->mX + (chr->w - 1) + cameraX)/20), ((chr->mY + 1 + cameraY)/20)) || map->isColliding(((chr->mX + 1 + cameraX)/20), ((chr->mY + (chr->h - 1) + cameraY)/20)) || map->isColliding(((chr->mX + (chr->w - 1) + cameraX)/20), ((chr->mY + (chr->h - 1) + cameraY)/20)))
 		{	
 			colliding = true;
 		}
 	}
 	else
 	{
-		if(map->isColliding(((chr->mX + 1)/20), ((chr->mY + 1)/20)) || map->isColliding(((chr->mX + 19)/20), ((chr->mY + 1)/20)) || map->isColliding(((chr->mX + 1)/20), ((chr->mY + 39)/20)) || map->isColliding(((chr->mX + 19)/20), ((chr->mY + 39)/20)))
+		if(map->isColliding(((chr->mX + 1)/20), ((chr->mY + 1)/20)) || map->isColliding(((chr->mX + (chr->w - 1))/20), ((chr->mY + 1)/20)) || map->isColliding(((chr->mX + 1)/20), ((chr->mY + (chr->h - 1))/20)) || map->isColliding(((chr->mX + (chr->w - 1))/20), ((chr->mY + (chr->h - 1))/20)))
 		{
 			colliding = true;
 		}
