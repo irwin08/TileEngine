@@ -360,6 +360,7 @@ void GameManager::characterJump(std::shared_ptr<Character> chr, bool isPlayer)
 
 void GameManager::updateMap()
 {
+	//multithreaded function
 	while(!quit)
 	{
 		//update map
