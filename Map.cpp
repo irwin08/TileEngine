@@ -83,7 +83,6 @@ void Map::renderOffset(SDL_Renderer *gRenderer, int x, int y, int m, int n)
 		int l = 0;
 		for(int j = l; j < mX; j++)
 		{
-			//to keep the proportions we must multiply x by 4 because x is going up by 5
 			tiles[i][j]->render(gRenderer, ((j*20) - (x) + m), ((i*20) - (y) + n));
 		}
 		

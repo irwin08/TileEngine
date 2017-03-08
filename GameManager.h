@@ -18,6 +18,8 @@ class GameManager
 	
 		void Start();
 	
+		void updateMap();
+	
 		std::vector<std::shared_ptr<Character>> characters;
 		std::shared_ptr<Player> player;	
 		std::shared_ptr<Map> map;
@@ -38,6 +40,8 @@ class GameManager
 		bool quit;
 		
 		bool dead;
+		
+		bool pause;
 		
 		int mCharNum;
 		
