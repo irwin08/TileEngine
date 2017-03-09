@@ -4,6 +4,8 @@
 #include "Player.h"
 #include "Map.h"
 
+//GameManager class is what ties the pieces of the engine together.
+//It contains the game loop, responds to user input and executes engine commands
 class GameManager
 {
 	public:
@@ -33,19 +35,27 @@ class GameManager
 		int cameraX;
 		int cameraY;
 		
+		//tracks the total number of pixels the player has travelled across.
 		int distance;
 		
+		//records the distance at which the distance travelled was checked
 		int lastCheck;
 		
+		//checks to see if the player would like to quit, if not it keeps the game loop running
 		bool quit;
 		
+		//keeps track of players life status
 		bool dead;
 		
+		//tracks whether or not the game is paused
 		bool pause;
 		
+		//number of characters in characters vector
 		int mCharNum;
 		
+		//pointer to the renderer
 		SDL_Renderer *mRenderer;
 		
+		//counts number of frames since last update
 		int noUpdate;
 };

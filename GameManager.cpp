@@ -8,6 +8,7 @@
 #include "Timer.h"
 #include <thread>
 
+//constructor, sets default variables for game
 GameManager::GameManager(SDL_Renderer *renderer)
 {
 	cameraX = 0;
@@ -20,12 +21,12 @@ GameManager::GameManager(SDL_Renderer *renderer)
 	dead = false;
 }
 
+//function called to start game, contains game loop.
 void GameManager::Start()
 {
 	SDL_Event e;
 	
-	int playerJumpValue = 15;
-	
+	//sets frame rate.
 	const int FRAMES_PER_SECOND = 45;
 	
 	int frame = 0;
@@ -34,6 +35,7 @@ void GameManager::Start()
 	
 	pause = false;
 	
+	//checks to see whether pause key 'P' has been pressed
 	bool pKey = false;
 	
 	srand(time(NULL));
