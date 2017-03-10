@@ -19,6 +19,12 @@ GameManager::GameManager(SDL_Renderer *renderer)
 	noUpdate = 0;
 	lastCheck = 0;
 	dead = false;
+	
+	for(int i = 0; i < 100; i++)
+	{
+		bulletStatus[i].reset(false);
+		bullets[i].reset(new Character("characters/bullet.bmp", mRenderer))
+	}
 }
 
 //function called to start game, contains game loop.
@@ -39,8 +45,6 @@ void GameManager::Start()
 	bool pKey = false;
 	
 	srand(time(NULL));
-	
-	std::thread t = std::thread(updateMap);
 	
 	
 	while(!quit)
@@ -89,18 +93,54 @@ void GameManager::Start()
 		
 			const Uint8 *currentKeyStates = SDL_GetKeyboardState(NULL);
 			
-			/*if(currentKeyStates[SDL_SCANCODE_A])
+			if(currentKeyStates[SDL_SCANCODE_A])
 			{
-				player->moveLeft(&cameraX, &cameraY);
-				if(checkCollision(player, true))
-					player->moveRight(&cameraX, &cameraY, 200);
+				for(int i = 0; i < 3; i++)
+				{
+					player->moveLeft(&cameraX, &cameraY);
+					if(checkCollision(player, true))
+					{
+						player->moveRight(&cameraX, &cameraY, 200);
+						break;
+					}
+				}
 			}
 			if(currentKeyStates[SDL_SCANCODE_D])
 			{
-				player->moveRight(&cameraX, &cameraY, 200);
-				if(checkCollision(player, true))
-					player->moveLeft(&cameraX, &cameraY);
-			}*/
+				for(int i = 0; i < 3; i++)
+				{
+					player->moveRight(&cameraX, &cameraY, 200);
+					if(checkCollision(player, true))
+					{
+						player->moveLeft(&cameraX, &cameraY);
+						break;
+					}
+				}
+			}
+			if(currentKeyStates[SDL_SCANCODE_S])
+			{
+				for(int i = 0; i < 3; i++)
+				{
+					player->moveDown(&cameraX, &cameraY, 200);
+					if(checkCollision(player, true))
+					{
+						player->moveUp(&cameraX, &cameraY);
+						break;
+					}
+				}
+			}
+			if(currentKeyStates[SDL_SCANCODE_W])
+			{
+				for(int i = 0; i < 3; i++)
+				{
+					player->moveUp(&cameraX, &cameraY);
+					if(checkCollision(player, true))
+					{
+						player->moveDown(&cameraX, &cameraY, 200);
+						break;
+					}
+				}
+			}
 			if(currentKeyStates[SDL_SCANCODE_SPACE])
 			{
 				player->jump(15);
@@ -123,50 +163,44 @@ void GameManager::Start()
 			if(quit)
 				break;
 		}while(pause);
-		
-		
-		
-		//force player right at v=1px/frame
-		for(int i = 0; i < 3; i++)
-		{
-			player->moveRight(&cameraX, &cameraY, 200);
-			if(checkCollision(player, true))
-			{
-				player->moveLeft(&cameraX, &cameraY);
-				break;
-			}
-			distance++;
-		}
-		
-		//make characters jump
-		gravity(9);
-		characterJump(player, true);
 	
+
+		//fire and render bullets
+		for(int i = 0; i < 100; i++)
+		{
+			if(bulletStatus[i] == true)
+			{
+				switch(bullets[i]->direction)
+				{
+					case 0:
+					//left
+						break;
+					case 1:
+					//up
+						break;
+					case 2:
+					//right
+						break;
+					case 3:
+					//down
+						break;
+				}
+			}
+		}
+	
+		
 		if(dead)
 		{
 			std::cout << "Game over" << std::endl;
 			break;
 		}
+	
 		
 		SDL_SetRenderDrawColor(mRenderer, 0x00, 0x00, 0x00, 0x00);
 		SDL_RenderClear(mRenderer);
 		
-		std::cout << cameraX << std::endl;
-		
 		map->render(mRenderer, cameraX, cameraY);
 		
-		//3760 is just a magic number for the end of the map
-		if(cameraX > (4000 - 500))
-		{
-			int i = (cameraX - (4000 - 500));
-			map->renderOffset(mRenderer, cameraX, cameraY, (500 - i), 0);
-		}
-		
-		if(cameraX > 3750)
-		{
-			cameraX = 0;
-			(player->cameraCX) = 0;
-		}
 		
 		player->render();
 			
@@ -179,11 +213,6 @@ void GameManager::Start()
 		}
 
 		SDL_RenderPresent(mRenderer);
-		
-		
-		
-		
-		
 		
 		frame++;
 		
@@ -277,7 +306,7 @@ bool GameManager::checkCollision(std::shared_ptr<Character>chr, bool player)
 	
 	if(player)
 	{
-if(map->isColliding(((chr->mX + 1 + cameraX)/20), ((chr->mY + 1 + cameraY)/20)) || map->isColliding(((chr->mX + (chr->w - 1) + cameraX)/20), ((chr->mY + 1 + cameraY)/20)) || map->isColliding(((chr->mX + 1 + cameraX)/20), ((chr->mY + (chr->h - 1) + cameraY)/20)) || map->isColliding(((chr->mX + (chr->w - 1) + cameraX)/20), ((chr->mY + (chr->h - 1) + cameraY)/20)) || map->isColliding(((chr->mX + (chr->w/2) + cameraX)/20), ((chr->mY + (chr->h - 1) + cameraY)/20)) || map->isColliding(((chr->mX + (chr->w/2) + cameraX)/20), ((chr->mY + 1 + cameraY)/20)))
+		if(map->isColliding(((chr->mX + 1 + cameraX)/20), ((chr->mY + 1 + cameraY)/20)) || map->isColliding(((chr->mX + (chr->w - 1) + cameraX)/20), ((chr->mY + 1 + cameraY)/20)) || map->isColliding(((chr->mX + 1 + cameraX)/20), ((chr->mY + (chr->h - 1) + cameraY)/20)) || map->isColliding(((chr->mX + (chr->w - 1) + cameraX)/20), ((chr->mY + (chr->h - 1) + cameraY)/20)) || map->isColliding(((chr->mX + (chr->w/2) + cameraX)/20), ((chr->mY + (chr->h - 1) + cameraY)/20)) || map->isColliding(((chr->mX + (chr->w/2) + cameraX)/20), ((chr->mY + 1 + cameraY)/20)))
 		{	
 			colliding = true;
 		}
@@ -294,133 +323,21 @@ if(map->isColliding(((chr->mX + 1 + cameraX)/20), ((chr->mY + 1 + cameraY)/20)) 
 }
 
 
-void GameManager::gravity(int value)
+void GameManager::shoot(int x, int y, int direction)
 {
-	for(int i = 0; i < mCharNum; i++)
+	//direction 0=left 1=up 2=right 3=down
+	
+	int index;
+	
+	for(int i = 0; i < 100; i++)
 	{
-		for(int j = 0; j < value; j++)
-		{
-			
-			characters[i]->mY++;
-			if(characters[i]->mY < 0 || characters[i]->mY > (500-characters[i]->h))
-				dead = true;
-			else if(checkCollision(characters[i], false))
-			{
-				characters[i]->mY--;
-				break;
-			}
-		}
+		if(bulletStatus[i] == false)
+			index = i;
 	}
 	
-	for(int i = 0; i < value; i++)
-	{
-		player->mY++;
-		if(player->mY < 0 || player->mY > (500-player->h))
-				dead = true;
-		else if(checkCollision(player, true))
-		{
-			player->mY--;
-			break;
-		}
-	}
+	bullets[i]->direction = direction;
+	bullets[i]->mX = x;
+	bullets[i]->mY = y;
 }
 
-void GameManager::characterJump(std::shared_ptr<Character> chr, bool isPlayer)
-{
-	if(chr->jumping)
-	{
-		if(chr->jumpingInterval < 15)
-		{
-			for(int i = 0; i < chr->jumpValue; i++)
-			{
-				chr->mY--;
-				if(player->mY < 0 || player->mY > 500)
-				{	
-					dead = true;
-					break;
-				}
-				if(checkCollision(chr, isPlayer))
-				{
-					chr->mY++;
-					chr->jumpingInterval = 15;
-					break;
-				}
-			}
-			
-			
-			
-			
-			chr->jumpingInterval++;
-		}
-		else
-		{
-			chr->jumpingInterval = 0;
-			chr->jumping = false;
-		}
-	}
-}
 
-void GameManager::updateMap()
-{
-	//multithreaded function
-	while(!quit)
-	{
-		//update map
-		
-		do
-		{
-			
-		} while(pause);
-		
-		//check to see if part of the map is offscreen so we can edit it
-		if((distance - 500) > 0)
-		{
-			int i;
-			if((((cameraX+200)/20)-20) < 0)
-				i = 0;
-			else
-				i = (((cameraX+200)/20)-20);
-			for(; i < (((cameraX+200)/20)-19); i++)
-			{
-				for(int j = 0; j < 25; j++)
-				{
-					if(!(map->getTileType(i, j) == 3))
-						map->changeTileType(3, i, j);
-				}
-				noUpdate++;
-			}
-			
-			if((distance - lastCheck) > 500)
-			{
-				lastCheck = distance;
-				noUpdate = 0;
-				
-				int collumn = rand() % 5 + (((cameraX+200)/20)-25);
-				
-				int holeWidth = ((rand() % 10000 + 1000)/(cameraX+200))/20;
-				
-				if(holeWidth < 5)
-					holeWidth = 5;
-				if(holeWidth > 15)
-					holeWidth = 15;
-				
-				int start = rand() % 25 - holeWidth;
-				if(start < 0)
-					start = 0;
-				
-				for(int k = 0; k < 25; k++)
-				{
-					map->changeTileType(4, collumn, k);
-				}
-				
-				for(int k = 0; k < holeWidth; k++)
-				{
-					//std::cout << collumn << " " << start << std::endl;
-					map->changeTileType(3, collumn, start);
-					start++;
-				}
-				
-			}
-		}
-	}
-}

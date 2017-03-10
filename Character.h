@@ -23,6 +23,9 @@ class Character
 		int w;
 		int h;
 		
+		//orientation of character 0=left 1=up 2=right 3=down
+		int direction;
+		
 		//camera location for character
 		int cameraCX;
 		int cameraCY;

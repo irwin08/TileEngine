@@ -16,11 +16,11 @@ class GameManager
 		
 		void loadCharacters(char *playerName, char *fileName, int playerX, int playerY, int charNum);
 	
-		void characterJump(std::shared_ptr<Character> chr, bool isPlayer);
-	
 		void Start();
 	
 		void updateMap();
+		
+		void shoot(int x, int y, int direction);
 	
 		std::vector<std::shared_ptr<Character>> characters;
 		std::shared_ptr<Player> player;	
@@ -30,16 +30,8 @@ class GameManager
 		
 		bool checkCollision(std::shared_ptr<Character>chr, bool player);
 		
-		void gravity(int value);
-		
 		int cameraX;
 		int cameraY;
-		
-		//tracks the total number of pixels the player has travelled across.
-		int distance;
-		
-		//records the distance at which the distance travelled was checked
-		int lastCheck;
 		
 		//checks to see if the player would like to quit, if not it keeps the game loop running
 		bool quit;
@@ -52,10 +44,10 @@ class GameManager
 		
 		//number of characters in characters vector
 		int mCharNum;
+
+		std::vector<std::shared_ptr<Character>> bullets;
+		std::vector<bool> bulletStatus;
 		
 		//pointer to the renderer
 		SDL_Renderer *mRenderer;
-		
-		//counts number of frames since last update
-		int noUpdate;
 };

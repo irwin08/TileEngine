@@ -11,11 +11,11 @@ void Player::moveUp(int *cameraX, int *cameraY)
 {
 	if(*cameraY <= 0)
 	{
-		mY -= 5;
+		mY -= 1;
 	}
 	else
 	{
-		*cameraY -= 5;
+		*cameraY -= 1;
 	}
 }
 
@@ -23,11 +23,11 @@ void Player::moveLeft(int *cameraX, int *cameraY)
 {
 	if(*cameraX <= 0)
 	{
-		mX -= 5;
+		mX -= 1;
 	}
 	else
 	{
-		*cameraX -= 5;
+		*cameraX -= 1;
 	}
 }
 
@@ -49,10 +49,10 @@ void Player::moveDown(int *cameraX, int *cameraY, int height)
 	//height = 200 for now
 	if(mY < height)
 	{
-		mY += 5;
+		mY += 1;
 	}
 	else
 	{
-		*cameraY += 5;
+		*cameraY += 1;
 	}
 }
