@@ -1,3 +1,4 @@
+//timer class - tracks time
 class Timer
 {
 	public:

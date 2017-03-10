@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>
 #include <string>
 
+//character class - holds data relevant to in game characters
 class Character
 {
 	public:
@@ -14,31 +15,34 @@ class Character
 		void moveRight();
 		void moveDown();
 		
-		
+		//location on screen
 		int mX;
 		int mY;
 		
+		//width and height of character
 		int w;
 		int h;
 		
+		//camera location for character
 		int cameraCX;
 		int cameraCY;
 		
+		//unique name of character
 		std::string name;
 		
 		void jump(int value);
 		
+		//values used by jump function to properly time it
 		bool jumping;
 		int jumpingInterval;
 		int jumpValue;
-	
-		int correctValue;
 	
 	protected:
 	
 		//will need to implement sprite walking animations later, this is for that.
 		bool walking;
 		
+		//Pointers to necessary SDL values
 		SDL_Texture *mTexture;
 		SDL_Renderer *mRenderer;
 		
