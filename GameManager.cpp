@@ -15,16 +15,10 @@ GameManager::GameManager(SDL_Renderer *renderer)
 	cameraY = 0;
 	mRenderer = renderer;
 	quit = 0;
-	distance = 0;
-	noUpdate = 0;
-	lastCheck = 0;
+	//distance = 0;
+	//noUpdate = 0;
+	//lastCheck = 0;
 	dead = false;
-	
-	for(int i = 0; i < 100; i++)
-	{
-		bulletStatus[i].reset(false);
-		bullets[i].reset(new Character("characters/bullet.bmp", mRenderer))
-	}
 }
 
 //function called to start game, contains game loop.
@@ -44,12 +38,19 @@ void GameManager::Start()
 	//checks to see whether pause key 'P' has been pressed
 	bool pKey = false;
 	
-	srand(time(NULL));
 	
+	
+	for(int i = 0; i < 100; i++)
+	{
+		bulletStatus[i] = false;
+		bullets.resize(100);
+		bullets[i].reset(new Character("characters/bullet.bmp", mRenderer, 1, 1));
+	}
+	
+	srand(time(NULL));
 	
 	while(!quit)
 	{
-
 		fps.start();
 		
 		do
@@ -95,6 +96,8 @@ void GameManager::Start()
 			
 			if(currentKeyStates[SDL_SCANCODE_A])
 			{
+				player->direction = 0;
+				
 				for(int i = 0; i < 3; i++)
 				{
 					player->moveLeft(&cameraX, &cameraY);
@@ -107,6 +110,8 @@ void GameManager::Start()
 			}
 			if(currentKeyStates[SDL_SCANCODE_D])
 			{
+				player->direction = 2;
+				
 				for(int i = 0; i < 3; i++)
 				{
 					player->moveRight(&cameraX, &cameraY, 200);
@@ -119,6 +124,8 @@ void GameManager::Start()
 			}
 			if(currentKeyStates[SDL_SCANCODE_S])
 			{
+				player->direction = 3;
+				
 				for(int i = 0; i < 3; i++)
 				{
 					player->moveDown(&cameraX, &cameraY, 200);
@@ -131,6 +138,8 @@ void GameManager::Start()
 			}
 			if(currentKeyStates[SDL_SCANCODE_W])
 			{
+				player->direction = 1;
+				
 				for(int i = 0; i < 3; i++)
 				{
 					player->moveUp(&cameraX, &cameraY);
@@ -143,7 +152,25 @@ void GameManager::Start()
 			}
 			if(currentKeyStates[SDL_SCANCODE_SPACE])
 			{
-				player->jump(15);
+				switch(player->direction)
+				{
+					case 0:
+						//left
+						shoot((player->mX - 1), player->mY, 0);
+						break;
+					case 1:
+						//up
+						shoot(player->mX, (player->mY - 1), 1);
+						break;
+					case 2:
+						//right
+						shoot((player->mX + player->w + 1), player->mY, 2);
+						break;
+					case 3:
+						//down
+						shoot(player->mX, (player->mY + player->h + 1), 3);
+						break;
+				}
 			}
 			if(currentKeyStates[SDL_SCANCODE_P])
 			{
@@ -164,8 +191,7 @@ void GameManager::Start()
 				break;
 		}while(pause);
 	
-
-		//fire and render bullets
+		//fire bullets
 		for(int i = 0; i < 100; i++)
 		{
 			if(bulletStatus[i] == true)
@@ -174,15 +200,39 @@ void GameManager::Start()
 				{
 					case 0:
 					//left
+						bullets[i]->mX--;
+						if(bullets[i]->mX <= 0)
+						{
+							bullets[i]->mX = 0;
+							bulletStatus[i] = false;
+						}
 						break;
 					case 1:
 					//up
+						bullets[i]->mY--;
+						if(bullets[i]->mY <= 0)
+						{
+							bullets[i]->mY = 0;
+							bulletStatus[i] = false;
+						}
 						break;
 					case 2:
 					//right
+						bullets[i]->mX++;
+						if(bullets[i]->mX >= ((20*map->getX()) - bullets[i]->w))
+						{
+							bullets[i]->mX = ((20*map->getX()) - bullets[i]->w);
+							bulletStatus[i] = false;
+						}
 						break;
 					case 3:
 					//down
+						bullets[i]->mY++;
+						if(bullets[i]->mY >= ((20*map->getY()) - bullets[i]->h))
+						{
+							bullets[i]->mY = ((20*map->getY()) - bullets[i]->h);
+							bulletStatus[i] = false;
+						}
 						break;
 				}
 			}
@@ -210,6 +260,16 @@ void GameManager::Start()
 			characters[i]->cameraCX = cameraX;
 			characters[i]->cameraCY = cameraY;
 			characters[i]->render();
+		}
+		
+		for(int i = 0; i < 100; i++)
+		{
+			if(bulletStatus[i] == true)
+			{
+				bullets[i]->cameraCX = cameraX;
+				bullets[i]->cameraCY = cameraY;
+				bullets[i]->render();
+			}
 		}
 
 		SDL_RenderPresent(mRenderer);
@@ -335,9 +395,11 @@ void GameManager::shoot(int x, int y, int direction)
 			index = i;
 	}
 	
-	bullets[i]->direction = direction;
-	bullets[i]->mX = x;
-	bullets[i]->mY = y;
+	bulletStatus[index] = true;
+	
+	bullets[index]->direction = direction;
+	bullets[index]->mX = x;
+	bullets[index]->mY = y;
 }
 
 

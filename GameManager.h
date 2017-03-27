@@ -46,7 +46,7 @@ class GameManager
 		int mCharNum;
 
 		std::vector<std::shared_ptr<Character>> bullets;
-		std::vector<bool> bulletStatus;
+		bool bulletStatus[100];
 		
 		//pointer to the renderer
 		SDL_Renderer *mRenderer;

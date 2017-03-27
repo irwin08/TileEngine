@@ -6,7 +6,7 @@ class Character
 {
 	public:
 		
-		Character(const char *path, SDL_Renderer *renderer);
+		Character(const char *path, SDL_Renderer *renderer, int width=40, int height=20);
 		
 		void render();
 		

@@ -1,7 +1,7 @@
 #include "Character.h"
 #include <iostream>
 
-Character::Character(const char *path, SDL_Renderer *renderer)
+Character::Character(const char *path, SDL_Renderer *renderer, int width, int height)
 {
 	cameraCX = 0;
 	cameraCY = 0;
@@ -12,8 +12,10 @@ Character::Character(const char *path, SDL_Renderer *renderer)
 	jumpingInterval = 0;
 	jumpValue = 1;
 	
-	w = 40;
-	h = 20;
+	w = width;
+	h = height;
+	
+	direction = 1;
 }
 
 void Character::loadTexture(const char *path)
