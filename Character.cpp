@@ -16,6 +16,8 @@ Character::Character(const char *path, SDL_Renderer *renderer, int width, int he
 	h = height;
 	
 	direction = 1;
+
+	health = 10;
 }
 
 void Character::loadTexture(const char *path)

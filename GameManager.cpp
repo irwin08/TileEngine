@@ -191,49 +191,69 @@ void GameManager::Start()
 				break;
 		}while(pause);
 	
-		//fire bullets
-		for(int i = 0; i < 100; i++)
+		for(int c = 0; c < 5; c++)
 		{
-			if(bulletStatus[i] == true)
+			
+			//fire bullets
+			for(int i = 0; i < 100; i++)
 			{
-				switch(bullets[i]->direction)
+				if(bulletStatus[i] == true)
 				{
-					case 0:
-					//left
-						bullets[i]->mX--;
-						if(bullets[i]->mX <= 0)
+					switch(bullets[i]->direction)
+					{
+						case 0:
+						//left
+							bullets[i]->mX--;
+							if(bullets[i]->mX <= 0)
+							{
+								bullets[i]->mX = 0;
+								bulletStatus[i] = false;
+							}
+							break;
+						case 1:
+						//up
+							bullets[i]->mY--;
+							if(bullets[i]->mY <= 0)
+							{
+								bullets[i]->mY = 0;
+								bulletStatus[i] = false;
+							}
+							break;
+						case 2:
+						//right
+							bullets[i]->mX++;
+							if(bullets[i]->mX >= ((20*map->getX()) - bullets[i]->w))
+							{
+								bullets[i]->mX = ((20*map->getX()) - bullets[i]->w);
+								bulletStatus[i] = false;
+							}
+							break;
+						case 3:
+						//down
+							bullets[i]->mY++;
+							if(bullets[i]->mY >= ((20*map->getY()) - bullets[i]->h))
+							{
+								bullets[i]->mY = ((20*map->getY()) - bullets[i]->h);
+								bulletStatus[i] = false;
+							}
+							break;
+					}
+					
+					if(checkCollision(bullets[i], false))
+					{
+						for(int k = 0; k < mCharNum; k++)
 						{
-							bullets[i]->mX = 0;
-							bulletStatus[i] = false;
+							if((bullets[i]->mX > characters[k]->mX) && (bullets[i]->mX < (characters[k]->mX + characters[k]->w)))
+							{
+								if((bullets[i]->mY > characters[k]->mY) && (bullets[i]->mY < (characters[k]->mX + characters[k]->w)))
+								{
+									//character hit
+									characters[k]->health -= 3;
+								}
+							}
 						}
-						break;
-					case 1:
-					//up
-						bullets[i]->mY--;
-						if(bullets[i]->mY <= 0)
-						{
-							bullets[i]->mY = 0;
-							bulletStatus[i] = false;
-						}
-						break;
-					case 2:
-					//right
-						bullets[i]->mX++;
-						if(bullets[i]->mX >= ((20*map->getX()) - bullets[i]->w))
-						{
-							bullets[i]->mX = ((20*map->getX()) - bullets[i]->w);
-							bulletStatus[i] = false;
-						}
-						break;
-					case 3:
-					//down
-						bullets[i]->mY++;
-						if(bullets[i]->mY >= ((20*map->getY()) - bullets[i]->h))
-						{
-							bullets[i]->mY = ((20*map->getY()) - bullets[i]->h);
-							bulletStatus[i] = false;
-						}
-						break;
+						bulletStatus[i] = false;
+					}
 				}
 			}
 		}
@@ -243,6 +263,16 @@ void GameManager::Start()
 		{
 			std::cout << "Game over" << std::endl;
 			break;
+		}
+		
+		for(int i = 0; i < mCharNum; i++)
+		{
+			if(characters[i]->health <= 0)
+			{
+				characters.erase(characters.begin() + i);
+				mCharNum--;
+				i--;
+			}
 		}
 	
 		
@@ -313,7 +343,7 @@ void GameManager::loadCharacters(char *playerName, char *fileName, int playerX, 
 			switch(i)
 			{
 				case 0:
-					characters[y].reset(new Character(each.c_str(), mRenderer));
+					characters[y].reset(new Character(each.c_str(), mRenderer, 20, 40));
 					break;
 				case 1:
 					characters[y]->name = each;
