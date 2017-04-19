@@ -156,19 +156,19 @@ void GameManager::Start()
 				{
 					case 0:
 						//left
-						shoot((player->mX - 1), player->mY, 0);
+						shoot((cameraX - 1 + player->mX), cameraY + player->mY, 0);
 						break;
 					case 1:
 						//up
-						shoot(player->mX, (player->mY - 1), 1);
+						shoot(cameraX + player->mX, (cameraY - 1 + player->mY), 1);
 						break;
 					case 2:
 						//right
-						shoot((player->mX + player->w + 1), player->mY, 2);
+						shoot((cameraX + player->w + 1 + player->mX), cameraY + player->mY, 2);
 						break;
 					case 3:
 						//down
-						shoot(player->mX, (player->mY + player->h + 1), 3);
+						shoot(cameraX + player->mX,(cameraY + player->h + 1 + player->mY), 3);
 						break;
 				}
 			}
@@ -274,6 +274,33 @@ void GameManager::Start()
 				i--;
 			}
 		}
+		
+		//handle characters auto patrols
+		for(int i = 0; i < mCharNum; i++)
+		{
+			switch(characters[i]->autoMoveRoute[characters[i]->autoMoveIndex])
+			{
+				case 0:
+					//left
+					characters[i]->moveLeft();
+					break;
+				case 1:
+					//up
+					characters[i]->moveUp();
+					break;
+				case 2:
+					//right
+					characters[i]->moveRight();
+					break;
+				case 3:
+					//down
+					characters[i]->moveDown();
+					break;
+			}
+			characters[i]->autoMoveIndex++;
+			if(characters[i]->autoMoveIndex >= characters[i]->autoMoveRoute.size())
+				characters[i]->autoMoveIndex = 0;
+		}
 	
 		
 		SDL_SetRenderDrawColor(mRenderer, 0x00, 0x00, 0x00, 0x00);
@@ -354,6 +381,16 @@ void GameManager::loadCharacters(char *playerName, char *fileName, int playerX, 
 				case 3:
 					characters[y]->mY = stoi(each);
 					break;
+				case 4:
+					//auto patrol path
+					system("PAUSE");
+					for(int j = 0; j < each.length(); j++)
+					{
+						//4 because 20 tile width divided by 5 pixels per move equals 4
+						for(int k = 0; k < 4; k++)
+							characters[y]->autoMoveRoute.push_back((int)each[j]);
+					}
+					break;
 			}
 			
 			
@@ -396,7 +433,7 @@ bool GameManager::checkCollision(std::shared_ptr<Character>chr, bool player)
 	
 	if(player)
 	{
-		if(map->isColliding(((chr->mX + 1 + cameraX)/20), ((chr->mY + 1 + cameraY)/20)) || map->isColliding(((chr->mX + (chr->w - 1) + cameraX)/20), ((chr->mY + 1 + cameraY)/20)) || map->isColliding(((chr->mX + 1 + cameraX)/20), ((chr->mY + (chr->h - 1) + cameraY)/20)) || map->isColliding(((chr->mX + (chr->w - 1) + cameraX)/20), ((chr->mY + (chr->h - 1) + cameraY)/20)) || map->isColliding(((chr->mX + (chr->w/2) + cameraX)/20), ((chr->mY + (chr->h - 1) + cameraY)/20)) || map->isColliding(((chr->mX + (chr->w/2) + cameraX)/20), ((chr->mY + 1 + cameraY)/20)))
+		if(map->isColliding(((chr->mX + 1 + cameraX)/20), ((chr->mY + 1 + cameraY)/20)) || map->isColliding(((chr->mX + (chr->w - 1) + cameraX)/20), ((chr->mY + 1 + cameraY)/20)) || map->isColliding(((chr->mX + 1 + cameraX)/20), ((chr->mY + (chr->h - 1) + cameraY)/20)) || map->isColliding(((chr->mX + (chr->w - 1) + cameraX)/20), ((chr->mY + (chr->h - 1) + cameraY)/20)) || map->isColliding(((chr->mX + (chr->w/2) + cameraX)/20), ((chr->mY + (chr->h - 1) + cameraY)/20)) || map->isColliding(((chr->mX + (chr->w/2) + cameraX)/20), ((chr->mY + 1 + cameraY)/20)) || map->isColliding((chr->mX + cameraX)/20, (chr->mY + cameraY + (chr->h/2))/20) || map->isColliding((chr->mX + chr->w + cameraX)/20,(chr->mY + cameraY + (chr->h/2))/20) || map->isColliding((chr->mX + cameraX + (chr->w/2))/20, (chr->mY + cameraY + (chr->h/2))/20))
 		{	
 			colliding = true;
 		}

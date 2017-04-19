@@ -18,6 +18,8 @@ Character::Character(const char *path, SDL_Renderer *renderer, int width, int he
 	direction = 1;
 
 	health = 10;
+	
+	autoMoveIndex = 0;
 }
 
 void Character::loadTexture(const char *path)

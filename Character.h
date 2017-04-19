@@ -1,12 +1,13 @@
 #include <SDL2/SDL.h>
 #include <string>
+#include <vector>
 
 //character class - holds data relevant to in game characters
 class Character
 {
 	public:
 		
-		Character(const char *path, SDL_Renderer *renderer, int width=40, int height=20);
+		Character(const char *path, SDL_Renderer *renderer, int width=20, int height=40);
 		
 		void render();
 		
@@ -41,6 +42,11 @@ class Character
 		int jumpValue;
 	
 		int health;
+		
+		
+		//automove - create patrol routes and such
+		std::vector<int> autoMoveRoute;
+		int autoMoveIndex;
 	
 	protected:
 	

@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
 	
 	GameManager *gameManager = new GameManager(gRenderer);
 	gameManager->loadMap("maps/zombiebattle.map", 50, 50);
-	gameManager->loadCharacters("characters/copter.bmp", "characters/walmart.char", 50, 50, 1);
+	gameManager->loadCharacters("characters/associate.bmp", "characters/walmart.char", 50, 50, 1);
 	gameManager->Start();
 	
 	return 0;
