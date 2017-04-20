@@ -278,28 +278,45 @@ void GameManager::Start()
 		//handle characters auto patrols
 		for(int i = 0; i < mCharNum; i++)
 		{
+			if(characters[i]->autoMoveIndex != -1)
+			{
 			switch(characters[i]->autoMoveRoute[characters[i]->autoMoveIndex])
 			{
 				case 0:
 					//left
-					characters[i]->moveLeft();
+					if(!checkCollision(characters[i], false))
+						characters[i]->moveLeft();
+					else
+						characters[i]->autoMoveIndex--;
 					break;
 				case 1:
 					//up
-					characters[i]->moveUp();
+					if(!checkCollision(characters[i], false))
+						characters[i]->moveUp();
+					else
+						characters[i]->autoMoveIndex--;
 					break;
 				case 2:
 					//right
-					characters[i]->moveRight();
+					if(!checkCollision(characters[i], false))
+						characters[i]->moveRight();
+					else
+						characters[i]->autoMoveIndex--;
 					break;
 				case 3:
 					//down
-					characters[i]->moveDown();
+					if(!checkCollision(characters[i], false))
+						characters[i]->moveDown();
+					else
+						characters[i]->autoMoveIndex--;
 					break;
 			}
 			characters[i]->autoMoveIndex++;
 			if(characters[i]->autoMoveIndex >= characters[i]->autoMoveRoute.size())
 				characters[i]->autoMoveIndex = 0;
+			
+			std::cout << "Autorun: " << characters[i]->autoMoveRoute[characters[i]->autoMoveIndex] << std::endl;
+			}
 		}
 	
 		
@@ -383,12 +400,15 @@ void GameManager::loadCharacters(char *playerName, char *fileName, int playerX, 
 					break;
 				case 4:
 					//auto patrol path
-					system("PAUSE");
 					for(int j = 0; j < each.length(); j++)
 					{
-						//4 because 20 tile width divided by 5 pixels per move equals 4
-						for(int k = 0; k < 4; k++)
-							characters[y]->autoMoveRoute.push_back((int)each[j]);
+						//4 because 20 tile width divided by 2 pixels per move equals 10
+						for(int k = 0; k < 10; k++)
+						{
+							characters[y]->autoMoveRoute.push_back((int)each[j]-48);
+							std::cout << characters[y]->autoMoveRoute.back() << std::endl;
+						}
+						characters[y]->autoMoveIndex = 0;
 					}
 					break;
 			}
@@ -419,6 +439,8 @@ bool GameManager::checkCollision(std::shared_ptr<Character>chr, bool player)
 		}
 		else
 		{
+			if(chr->name == characters[i]->name)
+				continue;
 			if(chr->mX < (characters[i]->mX + characters[i]->w) && (chr->mX + characters[i]->w) > characters[i]->mX && chr->name != characters[i]->name)
 			{
 				if(chr->mY < (characters[i]->mY + characters[i]->h) && (chr->mY + characters[i]->h) > characters[i]->mY)
@@ -426,6 +448,14 @@ bool GameManager::checkCollision(std::shared_ptr<Character>chr, bool player)
 					colliding = true;
 				}
 			}
+			
+			//check chr vs player
+			if((this->player->mX + cameraX) < (chr->mX + 20) && (this->player->mX + cameraX + 20) > chr->mX)
+			{
+				if((this->player->mY + cameraY) < (chr->mY + 40) && (this->player->mY + cameraY + 40) > chr->mY)
+					colliding = true;
+			}
+			
 		}
 	}
 	

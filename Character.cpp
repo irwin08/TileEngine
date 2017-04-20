@@ -19,7 +19,7 @@ Character::Character(const char *path, SDL_Renderer *renderer, int width, int he
 
 	health = 10;
 	
-	autoMoveIndex = 0;
+	autoMoveIndex = -1;
 }
 
 void Character::loadTexture(const char *path)
@@ -50,22 +50,22 @@ void Character::render()
 
 void Character::moveUp()
 {
-	mY -= 5;
+	mY -= 2;
 }
 
 void Character::moveLeft()
 {
-	mX -= 5;
+	mX -= 2;
 }
 		
 void Character::moveRight()
 {
-	mX += 5;
+	mX += 2;
 }
 
 void Character::moveDown()
 {
-	mY += 5;
+	mY += 2;
 }
 
 
