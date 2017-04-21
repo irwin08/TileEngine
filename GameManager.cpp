@@ -5,8 +5,8 @@
 #include <fstream>
 #include <cstdlib>
 #include <ctime>
-#include "Timer.h"
 #include <thread>
+#include <cmath>
 
 //constructor, sets default variables for game
 GameManager::GameManager(SDL_Renderer *renderer)
@@ -24,28 +24,18 @@ GameManager::GameManager(SDL_Renderer *renderer)
 //function called to start game, contains game loop.
 void GameManager::Start()
 {
-	SDL_Event e;
 	
 	//sets frame rate.
 	const int FRAMES_PER_SECOND = 45;
 	
 	int frame = 0;
 	bool cap = true;
-	Timer fps;
 	
 	pause = false;
-	
 	//checks to see whether pause key 'P' has been pressed
-	bool pKey = false;
+	pKey = false;
 	
-	
-	
-	for(int i = 0; i < 100; i++)
-	{
-		bulletStatus[i] = false;
-		bullets.resize(100);
-		bullets[i].reset(new Character("characters/bullet.bmp", mRenderer, 1, 1));
-	}
+	initBullets();
 	
 	srand(time(NULL));
 	
@@ -53,44 +43,109 @@ void GameManager::Start()
 	{
 		fps.start();
 		
-		do
+		handleKeyboardInput();
+		
+		handleBullets();
+		
+		//handle ai functions
+		aiCombat();
+		autoMove();
+	
+		handleGraphics();
+		
+		frame++;
+		
+		if((cap == true) && (fps.get_ticks() < 1000 / FRAMES_PER_SECOND))
+		{
+			SDL_Delay((1000 / FRAMES_PER_SECOND) - fps.get_ticks());
+		}
+		
+	}
+}
+
+
+/*************************************************************************\
+*-------------------------------------------------------------------------*
+*--------------------------------METHODS----------------------------------*
+*-------------------------------------------------------------------------*
+\*************************************************************************/
+
+
+void GameManager::loadMap(char *fileName, int x, int y)
+{
+	map.reset(new Map(mRenderer, x, y, fileName, true));
+}
+
+void GameManager::loadCharacters(char *playerName, char *fileName, int playerX, int playerY, int charNum)
+{
+	player.reset(new Player(playerName, mRenderer));
+	player->mX = playerX;
+	player->mY = playerY;
+	
+	mCharNum = charNum;
+	
+	characters.resize(mCharNum);
+	
+	std::ifstream file(fileName);
+	std::string str;
+	
+	int y = 0;
+	
+	while(std::getline(file, str))
+	{
+		std::istringstream line(str);
+		int i = 0;
+		for(std::string each; std::getline(line, each, ','); i++)
+		{
+			switch(i)
+			{
+				case 0:
+					characters[y].reset(new Character(each.c_str(), mRenderer, 20, 40));
+					break;
+				case 1:
+					characters[y]->name = each;
+					break;
+				case 2:
+					characters[y]->mX = stoi(each);
+					break;
+				case 3:
+					characters[y]->mY = stoi(each);
+					break;
+				case 4:
+					//auto patrol path
+					for(int j = 0; j < each.length(); j++)
+					{
+						//4 because 20 tile width divided by 2 pixels per move equals 10
+						for(int k = 0; k < 10; k++)
+						{
+							characters[y]->autoMoveRoute.push_back((int)each[j]-48);
+							std::cout << characters[y]->autoMoveRoute.back() << std::endl;
+						}
+						characters[y]->autoMoveIndex = 0;
+					}
+					break;
+			}
+			
+			
+		}
+		
+		y++;
+	}
+	
+	file.close();
+}
+
+
+void GameManager::handleKeyboardInput()
+{
+	do
 		{
 			while(SDL_PollEvent(&e) != 0)
 			{
 				if(e.type == SDL_QUIT)
 					quit = 1;
-				/*else if(e.type == SDL_KEYDOWN)
-				{
-					switch(e.key.keysym.sym)
-					{
-						case SDLK_w:
-							player->moveUp(&cameraX, &cameraY);
-							if(checkCollision(player, true))
-								player->moveDown(&cameraX, &cameraY, 200);
-							break;
-						case SDLK_s:
-							player->moveDown(&cameraX, &cameraY, 200);
-							if(checkCollision(player, true))
-								player->moveUp(&cameraX, &cameraY);
-							break;
-						case SDLK_a:
-							player->moveLeft(&cameraX, &cameraY);
-							if(checkCollision(player, true))
-								player->moveRight(&cameraX, &cameraY, 200);
-							break;
-						case SDLK_d:
-							player->moveRight(&cameraX, &cameraY, 200);
-							if(checkCollision(player, true))
-								player->moveLeft(&cameraX, &cameraY);
-							break;
-						case SDLK_SPACE:
-							player->jump(15);
-							break;
-					}
-				}*/
 			}
-		
-		
+
 		
 			const Uint8 *currentKeyStates = SDL_GetKeyboardState(NULL);
 			
@@ -190,137 +245,12 @@ void GameManager::Start()
 			if(quit)
 				break;
 		}while(pause);
-	
-		for(int c = 0; c < 5; c++)
-		{
-			
-			//fire bullets
-			for(int i = 0; i < 100; i++)
-			{
-				if(bulletStatus[i] == true)
-				{
-					switch(bullets[i]->direction)
-					{
-						case 0:
-						//left
-							bullets[i]->mX--;
-							if(bullets[i]->mX <= 0)
-							{
-								bullets[i]->mX = 0;
-								bulletStatus[i] = false;
-							}
-							break;
-						case 1:
-						//up
-							bullets[i]->mY--;
-							if(bullets[i]->mY <= 0)
-							{
-								bullets[i]->mY = 0;
-								bulletStatus[i] = false;
-							}
-							break;
-						case 2:
-						//right
-							bullets[i]->mX++;
-							if(bullets[i]->mX >= ((20*map->getX()) - bullets[i]->w))
-							{
-								bullets[i]->mX = ((20*map->getX()) - bullets[i]->w);
-								bulletStatus[i] = false;
-							}
-							break;
-						case 3:
-						//down
-							bullets[i]->mY++;
-							if(bullets[i]->mY >= ((20*map->getY()) - bullets[i]->h))
-							{
-								bullets[i]->mY = ((20*map->getY()) - bullets[i]->h);
-								bulletStatus[i] = false;
-							}
-							break;
-					}
-					
-					if(checkCollision(bullets[i], false))
-					{
-						for(int k = 0; k < mCharNum; k++)
-						{
-							if((bullets[i]->mX > characters[k]->mX) && (bullets[i]->mX < (characters[k]->mX + characters[k]->w)))
-							{
-								if((bullets[i]->mY > characters[k]->mY) && (bullets[i]->mY < (characters[k]->mX + characters[k]->w)))
-								{
-									//character hit
-									characters[k]->health -= 3;
-								}
-							}
-						}
-						bulletStatus[i] = false;
-					}
-				}
-			}
-		}
-	
-		
-		if(dead)
-		{
-			std::cout << "Game over" << std::endl;
-			break;
-		}
-		
-		for(int i = 0; i < mCharNum; i++)
-		{
-			if(characters[i]->health <= 0)
-			{
-				characters.erase(characters.begin() + i);
-				mCharNum--;
-				i--;
-			}
-		}
-		
-		//handle characters auto patrols
-		for(int i = 0; i < mCharNum; i++)
-		{
-			if(characters[i]->autoMoveIndex != -1)
-			{
-			switch(characters[i]->autoMoveRoute[characters[i]->autoMoveIndex])
-			{
-				case 0:
-					//left
-					if(!checkCollision(characters[i], false))
-						characters[i]->moveLeft();
-					else
-						characters[i]->autoMoveIndex--;
-					break;
-				case 1:
-					//up
-					if(!checkCollision(characters[i], false))
-						characters[i]->moveUp();
-					else
-						characters[i]->autoMoveIndex--;
-					break;
-				case 2:
-					//right
-					if(!checkCollision(characters[i], false))
-						characters[i]->moveRight();
-					else
-						characters[i]->autoMoveIndex--;
-					break;
-				case 3:
-					//down
-					if(!checkCollision(characters[i], false))
-						characters[i]->moveDown();
-					else
-						characters[i]->autoMoveIndex--;
-					break;
-			}
-			characters[i]->autoMoveIndex++;
-			if(characters[i]->autoMoveIndex >= characters[i]->autoMoveRoute.size())
-				characters[i]->autoMoveIndex = 0;
-			
-			std::cout << "Autorun: " << characters[i]->autoMoveRoute[characters[i]->autoMoveIndex] << std::endl;
-			}
-		}
-	
-		
-		SDL_SetRenderDrawColor(mRenderer, 0x00, 0x00, 0x00, 0x00);
+}
+
+
+void GameManager::handleGraphics()
+{
+	SDL_SetRenderDrawColor(mRenderer, 0x00, 0x00, 0x00, 0x00);
 		SDL_RenderClear(mRenderer);
 		
 		map->render(mRenderer, cameraX, cameraY);
@@ -347,80 +277,8 @@ void GameManager::Start()
 		}
 
 		SDL_RenderPresent(mRenderer);
-		
-		frame++;
-		
-		if((cap == true) && (fps.get_ticks() < 1000 / FRAMES_PER_SECOND))
-		{
-			SDL_Delay((1000 / FRAMES_PER_SECOND) - fps.get_ticks());
-		}
-		
-	}
 }
 
-void GameManager::loadMap(char *fileName, int x, int y)
-{
-	map.reset(new Map(mRenderer, x, y, fileName, true));
-}
-
-void GameManager::loadCharacters(char *playerName, char *fileName, int playerX, int playerY, int charNum)
-{
-	player.reset(new Player(playerName, mRenderer));
-	player->mX = playerX;
-	player->mY = playerY;
-	
-	mCharNum = charNum;
-	
-	characters.resize(mCharNum);
-	
-	std::ifstream file(fileName);
-	std::string str;
-	
-	int y = 0;
-	
-	while(std::getline(file, str))
-	{
-		std::istringstream line(str);
-		int i = 0;
-		for(std::string each; std::getline(line, each, ','); i++)
-		{
-			switch(i)
-			{
-				case 0:
-					characters[y].reset(new Character(each.c_str(), mRenderer, 20, 40));
-					break;
-				case 1:
-					characters[y]->name = each;
-					break;
-				case 2:
-					characters[y]->mX = stoi(each);
-					break;
-				case 3:
-					characters[y]->mY = stoi(each);
-					break;
-				case 4:
-					//auto patrol path
-					for(int j = 0; j < each.length(); j++)
-					{
-						//4 because 20 tile width divided by 2 pixels per move equals 10
-						for(int k = 0; k < 10; k++)
-						{
-							characters[y]->autoMoveRoute.push_back((int)each[j]-48);
-							std::cout << characters[y]->autoMoveRoute.back() << std::endl;
-						}
-						characters[y]->autoMoveIndex = 0;
-					}
-					break;
-			}
-			
-			
-		}
-		
-		y++;
-	}
-	
-	file.close();
-}
 
 bool GameManager::checkCollision(std::shared_ptr<Character>chr, bool player)
 {
@@ -499,4 +357,215 @@ void GameManager::shoot(int x, int y, int direction)
 	bullets[index]->mY = y;
 }
 
+
+void GameManager::initBullets()
+{
+	for(int i = 0; i < 100; i++)
+	{
+		bulletStatus[i] = false;
+		bullets.resize(100);
+		bullets[i].reset(new Character("characters/bullet.bmp", mRenderer, 1, 1));
+	}
+}
+
+void GameManager::handleBullets()
+{
+	for(int c = 0; c < 5; c++)
+		{
+			
+			//fire bullets
+			for(int i = 0; i < 100; i++)
+			{
+				if(bulletStatus[i] == true)
+				{
+					switch(bullets[i]->direction)
+					{
+						case 0:
+						//left
+							bullets[i]->mX--;
+							if(bullets[i]->mX <= 0)
+							{
+								bullets[i]->mX = 0;
+								bulletStatus[i] = false;
+							}
+							break;
+						case 1:
+						//up
+							bullets[i]->mY--;
+							if(bullets[i]->mY <= 0)
+							{
+								bullets[i]->mY = 0;
+								bulletStatus[i] = false;
+							}
+							break;
+						case 2:
+						//right
+							bullets[i]->mX++;
+							if(bullets[i]->mX >= ((20*map->getX()) - bullets[i]->w))
+							{
+								bullets[i]->mX = ((20*map->getX()) - bullets[i]->w);
+								bulletStatus[i] = false;
+							}
+							break;
+						case 3:
+						//down
+							bullets[i]->mY++;
+							if(bullets[i]->mY >= ((20*map->getY()) - bullets[i]->h))
+							{
+								bullets[i]->mY = ((20*map->getY()) - bullets[i]->h);
+								bulletStatus[i] = false;
+							}
+							break;
+					}
+					
+					if(checkCollision(bullets[i], false))
+					{
+						for(int k = 0; k < mCharNum; k++)
+						{
+							if((bullets[i]->mX > characters[k]->mX) && (bullets[i]->mX < (characters[k]->mX + characters[k]->w)))
+							{
+								if((bullets[i]->mY > characters[k]->mY) && (bullets[i]->mY < (characters[k]->mX + characters[k]->w)))
+								{
+									//character hit
+									characters[k]->health -= 3;
+								}
+							}
+						}
+						bulletStatus[i] = false;
+					}
+				}
+			}
+		}
+	
+		
+		if(dead)
+		{
+			std::cout << "Game over" << std::endl;
+			quit = true;
+		}
+		
+		for(int i = 0; i < mCharNum; i++)
+		{
+			if(characters[i]->health <= 0)
+			{
+				characters.erase(characters.begin() + i);
+				mCharNum--;
+				i--;
+			}
+		}
+}
+
+
+void GameManager::aiCombat()
+{
+	//handle AI shooting
+		
+		for(int i = 0; i < mCharNum; i++)
+		{
+			switch(characters[i]->direction)
+			{
+				//0=left 1=up 2=right 3=down
+				case 0:
+					if(((player->mX + cameraX) - characters[i]->mX) < 0 && ((player->mX + cameraX) - characters[i]->mX) > -100)
+					{
+						if(abs(((player->mY + cameraY) - characters[i]->mY)) < 50)
+						{
+							shoot(characters[i]->mX - 1, characters[i]->mY, 0);
+						}
+					}
+					break;
+				case 1:
+					if(((player->mY + cameraY) - characters[i]->mY) < 0 && ((player->mY + cameraY) - characters[i]->mY) > -100)
+					{
+						if(abs(((player->mX + cameraX) - characters[i]->mX)) < 50)
+						{
+							shoot(characters[i]->mX, characters[i]->mY - 1, 0);
+						}
+					}
+				
+					break;
+				case 2:
+					if(((player->mX + cameraX) - characters[i]->mX) > 0 && ((player->mX + cameraX) - characters[i]->mX) < 100)
+					{
+						if(abs(((player->mY + cameraY) - characters[i]->mY)) < 50)
+						{
+							shoot(characters[i]->mX + 1, characters[i]->mY, 0);
+						}
+					}
+				
+					break;
+				case 3:
+					if(((player->mY + cameraY) - characters[i]->mY) > 0 && ((player->mY + cameraY) - characters[i]->mY) < 100)
+					{
+						if(abs(((player->mX + cameraX) - characters[i]->mX)) < 50)
+						{
+							shoot(characters[i]->mX, characters[i]->mY + 1, 0);
+						}
+					}
+				
+					break;
+			}
+		}
+}
+
+
+void GameManager::autoMove()
+{
+	//handle characters auto patrols
+		for(int i = 0; i < mCharNum; i++)
+		{
+			if(characters[i]->autoMoveIndex != -1)
+			{
+			switch(characters[i]->autoMoveRoute[characters[i]->autoMoveIndex])
+			{
+				case 0:
+					//left
+					if(!checkCollision(characters[i], false))
+						characters[i]->moveLeft();
+					else
+					{
+						characters[i]->autoMoveIndex -= 2;
+						characters[i]->moveRight();
+					}
+					break;
+				case 1:
+					//up
+					if(!checkCollision(characters[i], false))
+						characters[i]->moveUp();
+					else
+					{
+						characters[i]->autoMoveIndex -= 2;
+						characters[i]->moveDown();
+						
+					}
+					break;
+				case 2:
+					//right
+					if(!checkCollision(characters[i], false))
+						characters[i]->moveRight();
+					else
+					{
+						characters[i]->autoMoveIndex -= 2;
+						characters[i]->moveLeft();
+					}
+					break;
+				case 3:
+					//down
+					if(!checkCollision(characters[i], false))
+						characters[i]->moveDown();
+					else
+					{
+						characters[i]->autoMoveIndex -= 2;
+						characters[i]->moveUp();
+					}
+					break;
+			}
+			characters[i]->autoMoveIndex++;
+			if(characters[i]->autoMoveIndex >= characters[i]->autoMoveRoute.size())
+				characters[i]->autoMoveIndex = 0;
+			
+			std::cout << "Autorun: " << characters[i]->autoMoveRoute[characters[i]->autoMoveIndex] << std::endl;
+			}
+		}
+}
 
