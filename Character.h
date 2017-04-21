@@ -43,6 +43,7 @@ class Character
 	
 		int health;
 		
+		int ammo;
 		
 		//automove - create patrol routes and such
 		std::vector<int> autoMoveRoute;

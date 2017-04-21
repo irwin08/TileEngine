@@ -3,6 +3,7 @@
 #include <memory>
 #include "Player.h"
 #include "Map.h"
+#include "Timer.h"
 
 //GameManager class is what ties the pieces of the engine together.
 //It contains the game loop, responds to user input and executes engine commands
@@ -20,7 +21,19 @@ class GameManager
 	
 		void updateMap();
 		
+		void handleGraphics();
+		
 		void shoot(int x, int y, int direction);
+		
+		void handleKeyboardInput();
+		
+		void initBullets();
+		
+		void handleBullets();
+		
+		void aiCombat();
+		
+		void autoMove();
 	
 		std::vector<std::shared_ptr<Character>> characters;
 		std::shared_ptr<Player> player;	
@@ -30,8 +43,12 @@ class GameManager
 		
 		bool checkCollision(std::shared_ptr<Character>chr, bool player);
 		
+		SDL_Event e;
+		
 		int cameraX;
 		int cameraY;
+		
+		Timer fps;
 		
 		//checks to see if the player would like to quit, if not it keeps the game loop running
 		bool quit;
@@ -41,6 +58,8 @@ class GameManager
 		
 		//tracks whether or not the game is paused
 		bool pause;
+		
+		bool pKey;
 		
 		//number of characters in characters vector
 		int mCharNum;

@@ -15,6 +15,8 @@ Character::Character(const char *path, SDL_Renderer *renderer, int width, int he
 	w = width;
 	h = height;
 	
+	ammo = 20;
+	
 	direction = 1;
 
 	health = 10;
@@ -51,21 +53,26 @@ void Character::render()
 void Character::moveUp()
 {
 	mY -= 2;
+	//0=left 1=up 2=right 3=down
+	direction = 1;
 }
 
 void Character::moveLeft()
 {
 	mX -= 2;
+	direction = 0;
 }
 		
 void Character::moveRight()
 {
 	mX += 2;
+	direction = 2;
 }
 
 void Character::moveDown()
 {
 	mY += 2;
+	direction = 3;
 }
 
 
