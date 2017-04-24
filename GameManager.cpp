@@ -8,6 +8,27 @@
 #include <thread>
 #include <cmath>
 
+
+/******************************************************************************\
+*------------------------------------------------------------------------------*
+*-------------------------------DEBUGGING NOTES--------------------------------*
+*------------------------------------------------------------------------------*
+\******************************************************************************/
+/******************************************************************************\
+
+	1) The problem with the bullets not being able to fire up or to the left
+	seems to lie in the AI characters. When they are on the map, the bullets
+	have trouble, but when they are no longer on the map, the bullets work
+	fine. My theory is that this has something to do with both bullets and
+	characters coexisting in an array. I'll have to verify this with gdb.
+	
+	2) Note: When one  AI is killed, collision stops working with the other
+	AI. I'm not sure why, but it may somehow connect with #1. The AI will 
+	pass right through my character, yet when the AI is on top of the player,
+	I cannot move.
+	
+\******************************************************************************/	
+
 //constructor, sets default variables for game
 GameManager::GameManager(SDL_Renderer *renderer)
 {
@@ -119,7 +140,6 @@ void GameManager::loadCharacters(char *playerName, char *fileName, int playerX, 
 						for(int k = 0; k < 10; k++)
 						{
 							characters[y]->autoMoveRoute.push_back((int)each[j]-48);
-							std::cout << characters[y]->autoMoveRoute.back() << std::endl;
 						}
 						characters[y]->autoMoveIndex = 0;
 					}
@@ -365,6 +385,7 @@ void GameManager::initBullets()
 		bulletStatus[i] = false;
 		bullets.resize(100);
 		bullets[i].reset(new Character("characters/bullet.bmp", mRenderer, 1, 1));
+		bullets[i]->autoMoveIndex = -1;
 	}
 }
 
@@ -470,7 +491,7 @@ void GameManager::aiCombat()
 					{
 						if(abs(((player->mY + cameraY) - characters[i]->mY)) < 50)
 						{
-							shoot(characters[i]->mX - 1, characters[i]->mY, 0);
+							shoot(characters[i]->mX - 3, characters[i]->mY, 0);
 						}
 					}
 					break;
@@ -479,7 +500,7 @@ void GameManager::aiCombat()
 					{
 						if(abs(((player->mX + cameraX) - characters[i]->mX)) < 50)
 						{
-							shoot(characters[i]->mX, characters[i]->mY - 1, 0);
+							shoot(characters[i]->mX, characters[i]->mY - 3, 1);
 						}
 					}
 				
@@ -489,7 +510,7 @@ void GameManager::aiCombat()
 					{
 						if(abs(((player->mY + cameraY) - characters[i]->mY)) < 50)
 						{
-							shoot(characters[i]->mX + 1, characters[i]->mY, 0);
+							shoot(characters[i]->mX + characters[i]->w + 3, characters[i]->mY, 2);
 						}
 					}
 				
@@ -499,7 +520,7 @@ void GameManager::aiCombat()
 					{
 						if(abs(((player->mX + cameraX) - characters[i]->mX)) < 50)
 						{
-							shoot(characters[i]->mX, characters[i]->mY + 1, 0);
+							shoot(characters[i]->mX, characters[i]->mY + characters[i]->h, 3);
 						}
 					}
 				
@@ -564,7 +585,6 @@ void GameManager::autoMove()
 			if(characters[i]->autoMoveIndex >= characters[i]->autoMoveRoute.size())
 				characters[i]->autoMoveIndex = 0;
 			
-			std::cout << "Autorun: " << characters[i]->autoMoveRoute[characters[i]->autoMoveIndex] << std::endl;
 			}
 		}
 }
