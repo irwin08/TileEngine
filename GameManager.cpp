@@ -7,8 +7,6 @@
 #include <ctime>
 #include <thread>
 #include <cmath>
-<<<<<<< HEAD
-
 
 /******************************************************************************\
 *------------------------------------------------------------------------------*
@@ -29,8 +27,6 @@
 	I cannot move.
 	
 \******************************************************************************/	
-=======
->>>>>>> aa4243c2903595f9f8aba64599060fc330465008
 
 //constructor, sets default variables for game
 GameManager::GameManager(SDL_Renderer *renderer)
@@ -143,10 +139,6 @@ void GameManager::loadCharacters(char *playerName, char *fileName, int playerX, 
 						for(int k = 0; k < 10; k++)
 						{
 							characters[y]->autoMoveRoute.push_back((int)each[j]-48);
-<<<<<<< HEAD
-=======
-							std::cout << characters[y]->autoMoveRoute.back() << std::endl;
->>>>>>> aa4243c2903595f9f8aba64599060fc330465008
 						}
 						characters[y]->autoMoveIndex = 0;
 					}
@@ -310,7 +302,6 @@ void GameManager::handleGraphics()
 bool GameManager::checkCollision(std::shared_ptr<Character>chr, bool player)
 {
 	bool colliding = false;
-<<<<<<< HEAD
 	
 	//check with characters
 	for(int i = 0; i < mCharNum; i++)
@@ -347,44 +338,6 @@ bool GameManager::checkCollision(std::shared_ptr<Character>chr, bool player)
 	
 	//check with tiles
 	
-=======
-	
-	//check with characters
-	for(int i = 0; i < mCharNum; i++)
-	{
-		if(player)
-		{
-			if((chr->mX + cameraX) < (characters[i]->mX + 20) && (chr->mX + cameraX + 20) > characters[i]->mX)
-			{
-				if((chr->mY + cameraY) < (characters[i]->mY + 40) && (chr->mY + cameraY + 40) > characters[i]->mY)
-					colliding = true;
-			}
-		}
-		else
-		{
-			if(chr->name == characters[i]->name)
-				continue;
-			if(chr->mX < (characters[i]->mX + characters[i]->w) && (chr->mX + characters[i]->w) > characters[i]->mX && chr->name != characters[i]->name)
-			{
-				if(chr->mY < (characters[i]->mY + characters[i]->h) && (chr->mY + characters[i]->h) > characters[i]->mY)
-				{
-					colliding = true;
-				}
-			}
-			
-			//check chr vs player
-			if((this->player->mX + cameraX) < (chr->mX + 20) && (this->player->mX + cameraX + 20) > chr->mX)
-			{
-				if((this->player->mY + cameraY) < (chr->mY + 40) && (this->player->mY + cameraY + 40) > chr->mY)
-					colliding = true;
-			}
-			
-		}
-	}
-	
-	//check with tiles
-	
->>>>>>> aa4243c2903595f9f8aba64599060fc330465008
 	if(player)
 	{
 		if(map->isColliding(((chr->mX + 1 + cameraX)/20), ((chr->mY + 1 + cameraY)/20)) || map->isColliding(((chr->mX + (chr->w - 1) + cameraX)/20), ((chr->mY + 1 + cameraY)/20)) || map->isColliding(((chr->mX + 1 + cameraX)/20), ((chr->mY + (chr->h - 1) + cameraY)/20)) || map->isColliding(((chr->mX + (chr->w - 1) + cameraX)/20), ((chr->mY + (chr->h - 1) + cameraY)/20)) || map->isColliding(((chr->mX + (chr->w/2) + cameraX)/20), ((chr->mY + (chr->h - 1) + cameraY)/20)) || map->isColliding(((chr->mX + (chr->w/2) + cameraX)/20), ((chr->mY + 1 + cameraY)/20)) || map->isColliding((chr->mX + cameraX)/20, (chr->mY + cameraY + (chr->h/2))/20) || map->isColliding((chr->mX + chr->w + cameraX)/20,(chr->mY + cameraY + (chr->h/2))/20) || map->isColliding((chr->mX + cameraX + (chr->w/2))/20, (chr->mY + cameraY + (chr->h/2))/20))
@@ -431,10 +384,7 @@ void GameManager::initBullets()
 		bulletStatus[i] = false;
 		bullets.resize(100);
 		bullets[i].reset(new Character("characters/bullet.bmp", mRenderer, 1, 1));
-<<<<<<< HEAD
 		bullets[i]->autoMoveIndex = -1;
-=======
->>>>>>> aa4243c2903595f9f8aba64599060fc330465008
 	}
 }
 
@@ -540,11 +490,7 @@ void GameManager::aiCombat()
 					{
 						if(abs(((player->mY + cameraY) - characters[i]->mY)) < 50)
 						{
-<<<<<<< HEAD
 							shoot(characters[i]->mX - 3, characters[i]->mY, 0);
-=======
-							shoot(characters[i]->mX - 1, characters[i]->mY, 0);
->>>>>>> aa4243c2903595f9f8aba64599060fc330465008
 						}
 					}
 					break;
@@ -553,11 +499,7 @@ void GameManager::aiCombat()
 					{
 						if(abs(((player->mX + cameraX) - characters[i]->mX)) < 50)
 						{
-<<<<<<< HEAD
 							shoot(characters[i]->mX, characters[i]->mY - 3, 1);
-=======
-							shoot(characters[i]->mX, characters[i]->mY - 1, 0);
->>>>>>> aa4243c2903595f9f8aba64599060fc330465008
 						}
 					}
 				
@@ -567,11 +509,7 @@ void GameManager::aiCombat()
 					{
 						if(abs(((player->mY + cameraY) - characters[i]->mY)) < 50)
 						{
-<<<<<<< HEAD
 							shoot(characters[i]->mX + characters[i]->w + 3, characters[i]->mY, 2);
-=======
-							shoot(characters[i]->mX + 1, characters[i]->mY, 0);
->>>>>>> aa4243c2903595f9f8aba64599060fc330465008
 						}
 					}
 				
@@ -581,11 +519,7 @@ void GameManager::aiCombat()
 					{
 						if(abs(((player->mX + cameraX) - characters[i]->mX)) < 50)
 						{
-<<<<<<< HEAD
 							shoot(characters[i]->mX, characters[i]->mY + characters[i]->h, 3);
-=======
-							shoot(characters[i]->mX, characters[i]->mY + 1, 0);
->>>>>>> aa4243c2903595f9f8aba64599060fc330465008
 						}
 					}
 				
@@ -649,11 +583,6 @@ void GameManager::autoMove()
 			characters[i]->autoMoveIndex++;
 			if(characters[i]->autoMoveIndex >= characters[i]->autoMoveRoute.size())
 				characters[i]->autoMoveIndex = 0;
-			
-<<<<<<< HEAD
-=======
-			std::cout << "Autorun: " << characters[i]->autoMoveRoute[characters[i]->autoMoveIndex] << std::endl;
->>>>>>> aa4243c2903595f9f8aba64599060fc330465008
 			}
 		}
 }
