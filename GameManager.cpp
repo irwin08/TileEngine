@@ -20,6 +20,12 @@
 	have trouble, but when they are no longer on the map, the bullets work
 	fine. My theory is that this has something to do with both bullets and
 	characters coexisting in an array. I'll have to verify this with gdb.
+	|
+	-> Update: The bullets are now able to fire in all directions. They were
+	impeded by the implementation of the checkCollision method. The method
+	included a check that should have only applied to the AI but the bullets
+	went through as well. I stopped this, fixing the bug. However the AI
+	still cannot shoot in certain directions!
 	
 	2) Note: When one  AI is killed, collision stops working with the other
 	AI. I'm not sure why, but it may somehow connect with #1. The AI will 
@@ -311,7 +317,9 @@ bool GameManager::checkCollision(std::shared_ptr<Character>chr, bool player)
 			if((chr->mX + cameraX) < (characters[i]->mX + 20) && (chr->mX + cameraX + 20) > characters[i]->mX)
 			{
 				if((chr->mY + cameraY) < (characters[i]->mY + 40) && (chr->mY + cameraY + 40) > characters[i]->mY)
+				{	
 					colliding = true;
+				}
 			}
 		}
 		else
@@ -327,10 +335,15 @@ bool GameManager::checkCollision(std::shared_ptr<Character>chr, bool player)
 			}
 			
 			//check chr vs player
-			if((this->player->mX + cameraX) < (chr->mX + 20) && (this->player->mX + cameraX + 20) > chr->mX)
+			//insert bullet check
+			if((this->player->mX + cameraX) < (chr->mX + 20) && (this->player->mX + cameraX + 20) > chr->mX && chr->name != "Bullet")
 			{
 				if((this->player->mY + cameraY) < (chr->mY + 40) && (this->player->mY + cameraY + 40) > chr->mY)
+				{	
 					colliding = true;
+					
+					std::cout << "character #" << chr->name << " hitting you when moving down." << std::endl;
+				}
 			}
 			
 		}
@@ -385,6 +398,7 @@ void GameManager::initBullets()
 		bullets.resize(100);
 		bullets[i].reset(new Character("characters/bullet.bmp", mRenderer, 1, 1));
 		bullets[i]->autoMoveIndex = -1;
+		bullets[i]->name = "Bullet";
 	}
 }
 
@@ -572,11 +586,13 @@ void GameManager::autoMove()
 				case 3:
 					//down
 					if(!checkCollision(characters[i], false))
+					{
 						characters[i]->moveDown();
+					}
 					else
 					{
 						characters[i]->autoMoveIndex -= 2;
-						characters[i]->moveUp();
+						characters[i]->moveUp();				
 					}
 					break;
 			}
