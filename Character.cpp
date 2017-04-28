@@ -21,6 +21,8 @@ Character::Character(const char *path, SDL_Renderer *renderer, int width, int he
 
 	health = 10;
 	
+	hostile = 0;
+	
 	autoMoveIndex = -1;
 }
 

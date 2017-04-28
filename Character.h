@@ -45,6 +45,8 @@ class Character
 		
 		int ammo;
 		
+		int hostile;
+		
 		//automove - create patrol routes and such
 		std::vector<int> autoMoveRoute;
 		int autoMoveIndex;

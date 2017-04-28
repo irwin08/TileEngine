@@ -148,6 +148,17 @@ void GameManager::loadCharacters(char *playerName, char *fileName, int playerX, 
 						}
 						characters[y]->autoMoveIndex = 0;
 					}
+				case 5:
+					//if hostile set to move towards player
+					if(((int)each[0]-48) == 0)
+					{
+						//not hostile, do nothing
+					}
+					else if(((int)each[0]-48) == 1)
+					{
+						//hostile so set to follow
+						characters[y]->hostile = 1;
+					}
 					break;
 			}
 			
@@ -493,7 +504,7 @@ void GameManager::handleBullets()
 void GameManager::aiCombat()
 {
 	//handle AI shooting
-		
+	/*	
 		for(int i = 0; i < mCharNum; i++)
 		{
 			switch(characters[i]->direction)
@@ -540,6 +551,7 @@ void GameManager::aiCombat()
 					break;
 			}
 		}
+	*/
 }
 
 
@@ -599,6 +611,42 @@ void GameManager::autoMove()
 			characters[i]->autoMoveIndex++;
 			if(characters[i]->autoMoveIndex >= characters[i]->autoMoveRoute.size())
 				characters[i]->autoMoveIndex = 0;
+			}
+			
+			//handle player hostile
+			//bug when colliding w/ objects, bounces back but then when trying to
+			//chase after players while colliding will move in the opposite direction
+			//due to this check
+			if(characters[i]->hostile == 1)
+			{
+				if(characters[i]->mX > (player->mX + cameraX))
+				{
+					if(!checkCollision(characters[i], false))
+						characters[i]->moveLeft();
+					else
+						characters[i]->moveRight();
+				}
+				if(characters[i]->mY > (player->mY + cameraY))
+				{
+					if(!checkCollision(characters[i], false))
+						characters[i]->moveUp();
+					else
+						characters[i]->moveDown();
+				}
+				if(characters[i]->mX < (player->mX + cameraX))
+				{
+					if(!checkCollision(characters[i], false))
+						characters[i]->moveRight();
+					else
+						characters[i]->moveLeft();
+				}
+				if(characters[i]->mY < (player->mY + cameraY))
+				{
+					if(!checkCollision(characters[i], false))
+						characters[i]->moveDown();
+					else
+						characters[i]->moveUp();
+				}
 			}
 		}
 }
