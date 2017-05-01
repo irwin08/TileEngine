@@ -96,6 +96,16 @@ void Map::loadMap(const char *filePath, SDL_Renderer *gRenderer)
 	
 	std::ifstream file(filePath);
 	std::string str;
+	
+	//loading screen
+	SDL_Texture *tex = loadTexture("graphics/loading.bmp", gRenderer);
+	SDL_Rect rec;
+	rec.x = 250;
+	rec.y = 250;
+	rec.w =	215;
+	rec.h = 91;
+	
+	SDL_RenderCopy(gRenderer, tex, NULL, &rec);
 
 	while(std::getline(file, str))
 	{
@@ -168,6 +178,19 @@ bool Map::isColliding(int x, int y)
 {
 	return tiles[y][x]->collidable;
 }
+
+SDL_Texture *Map::loadTexture(char *path, SDL_Renderer *mRenderer)
+{
+	SDL_Texture *newTexture = NULL;
+	SDL_Surface *surface = SDL_LoadBMP(path);
+	
+	newTexture = SDL_CreateTextureFromSurface(mRenderer, surface);
+	
+	SDL_FreeSurface(surface);
+	
+	return newTexture;
+}
+
 	
 
 	

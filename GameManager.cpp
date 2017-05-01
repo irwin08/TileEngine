@@ -69,6 +69,12 @@ void GameManager::Start()
 	{
 		fps.start();
 		
+		if(player->health <= 0)
+		{
+			std::cout << "Game Over" << std::endl;
+			pause = true;
+		}
+		
 		handleKeyboardInput();
 		
 		handleBullets();
@@ -353,6 +359,8 @@ bool GameManager::checkCollision(std::shared_ptr<Character>chr, bool player)
 				{	
 					colliding = true;
 					
+					this->player->health--;
+					
 					std::cout << "character #" << chr->name << " hitting you when moving down." << std::endl;
 				}
 			}
@@ -619,6 +627,9 @@ void GameManager::autoMove()
 			//due to this check
 			if(characters[i]->hostile == 1)
 			{
+				if((abs(characters[i]->mX - (player->mX + cameraX)) < 200))
+				{
+				//
 				if(characters[i]->mX > (player->mX + cameraX))
 				{
 					if(!checkCollision(characters[i], false))
@@ -646,6 +657,8 @@ void GameManager::autoMove()
 						characters[i]->moveDown();
 					else
 						characters[i]->moveUp();
+				}
+				//
 				}
 			}
 		}

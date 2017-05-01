@@ -36,6 +36,8 @@ class Map
 		
 	private:
 		
+		SDL_Texture *loadTexture(char *path, SDL_Renderer *mRenderer);
+		
 		int mX;
 		int mY;
 		
