@@ -132,7 +132,7 @@ void GameManager::loadCharacters(char *playerName, char *fileName, int playerX, 
 			switch(i)
 			{
 				case 0:
-					characters[y].reset(new Character(each.c_str(), mRenderer, 20, 40));
+					characters[y].reset(new Character(each.c_str(), mRenderer, 20, 30));
 					break;
 				case 1:
 					characters[y]->name = each;
@@ -633,30 +633,56 @@ void GameManager::autoMove()
 				if(characters[i]->mX > (player->mX + cameraX))
 				{
 					if(!checkCollision(characters[i], false))
+					{
 						characters[i]->moveLeft();
+						if(characters[i]>0)
+							characters[i]->left--;
+					}
 					else
+					{
+						characters[i]->left+=2;
 						characters[i]->moveRight();
+						
+						if(characters[i]->left > 3)
+						{
+							if(characters[i]->up > 3)
+							{
+								characters[i]->moveDown();
+							}
+							else
+							{
+								//up
+								characters[i]->moveUp();
+							}
+						}
+					}
 				}
 				if(characters[i]->mY > (player->mY + cameraY))
 				{
 					if(!checkCollision(characters[i], false))
 						characters[i]->moveUp();
 					else
+					{
 						characters[i]->moveDown();
+					}
 				}
 				if(characters[i]->mX < (player->mX + cameraX))
 				{
 					if(!checkCollision(characters[i], false))
 						characters[i]->moveRight();
 					else
+					{
 						characters[i]->moveLeft();
+					}
 				}
 				if(characters[i]->mY < (player->mY + cameraY))
 				{
 					if(!checkCollision(characters[i], false))
 						characters[i]->moveDown();
 					else
+					{
 						characters[i]->moveUp();
+					}
 				}
 				//
 				}
