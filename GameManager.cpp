@@ -133,6 +133,7 @@ void GameManager::loadCharacters(char *playerName, char *fileName, int playerX, 
 			{
 				case 0:
 					characters[y].reset(new Character(each.c_str(), mRenderer, 20, 30));
+					d2[i] = -1;
 					break;
 				case 1:
 					characters[y]->name = each;
@@ -629,7 +630,7 @@ void GameManager::autoMove()
 			{
 				if((abs(characters[i]->mX - (player->mX + cameraX)) < 200))
 				{
-				//
+				/*
 				if(characters[i]->mX > (player->mX + cameraX))
 				{
 					if(!checkCollision(characters[i], false))
@@ -684,9 +685,170 @@ void GameManager::autoMove()
 						characters[i]->moveUp();
 					}
 				}
-				//
+				*/
+				
+				//hostility 2: pathfinding boogaloo
+				
+				//note for next day - pathfinding is almost done, just needs to be
+				//implemented for left and right in addition to up and down.
+				
+				// up = 0, down = 1, left = 2, right = 3
+				int direction;
+				
+				if(characters[i]->mX < (player->mX + cameraX))
+				{
+					//then character needs to move right
+					if(abs(characters[i]->mX - (player->mX + cameraX)) > abs(characters[i]->mY - (player->mX + cameraX)))
+					{
+						//definitely move right
+						direction = 3;
+					}
+					else
+					{
+						//move vertically
+						if(characters[i]->mY > (player->mY + cameraY))
+						{
+							//move up
+							direction = 0;
+						}
+						else
+						{
+							//move down
+							direction = 1;
+						}
+					}
 				}
+				else
+				{
+					//then character needs to move left
+					if(abs(characters[i]->mX - (player->mX + cameraX)) > abs(characters[i]->mY - (player->mX + cameraX)))
+					{
+						//definitely move left
+						direction = 2;
+					}
+					else
+					{
+						//move vertically
+						if(characters[i]->mY > (player->mY + cameraY))
+						{
+							//move up
+							direction = 0;
+						}
+						else
+						{
+							//move down
+							direction = 1;
+						}
+					}
+				}
+				
+				//direction determined
+				
+				int t;
+				
+				switch(direction)
+				{
+					case 0:
+						//up
+						if(d2 == -1 || d2 > 1)
+							d2 = 2;
+						t = map->getTileType(((characters[i]->mX/20)), ((characters[i]->mX/20)-1));
+						if(t == 3)
+						{
+							//tiles all clear!
+							if(!checkCollision(characters[i], false))
+								characters[i]->moveUp();
+							else
+							{
+								//check if left or right works then move
+								if(d2 == 2)
+								{
+									t = map->getTileType(((characters[i]->mX/20)-1), ((characters[i]->mX/20)));
+									if(t == 3)
+									{
+										if(!checkCollision(characters[i], false)
+											characters[i]->moveLeft();
+									}
+									else
+									{
+										d2 = 3;
+										if(!checkCollision(characters[i], false)
+											characters[i]->moveRight();
+									}
+								}
+								else
+								{
+									t = map->getTileType(((characters[i]->mX/20)+1), ((characters[i]->mX/20)));
+									if(t == 3)
+									{
+										if(!checkCollision(characters[i], false)
+											characters[i]->moveRight();
+									}
+									else
+									{
+										d2 = 2;
+										if(!checkCollision(characters[i], false)
+											characters[i]->moveLeft();
+									}
+								}
+							}
+						}
+						
+						break;
+					case 1:
+						//down
+						t = map->getTileType(((characters[i]->mX/20)), ((characters[i]->mX/20)+1));
+						if(t == 3)
+						{
+							if(!checkCollision(characters[i], false))
+								characters[i]->moveDown();
+							else
+							{
+								//check if left or right works then move
+							}
+						}
+						break;
+					case 2:
+						//left
+						t = map->getTileType(((characters[i]->mX/20)-1), ((characters[i]->mX/20)));
+						if(t == 3)
+						{
+							if(!checkCollision(characters[i], false))
+								characters[i]->moveLeft();
+							else
+							{
+								//check if up or down works then move
+							}
+						}
+						break;
+					case 3:
+						//right
+						t = map->getTileType(((characters[i]->mX/20)+1), ((characters[i]->mX/20)));
+						if(t == 3)
+						{
+							if(!checkCollision(characters[i], false))
+								characters[i]->moveDown();
+							else
+							{
+								//check if up or down works then move
+							}
+						}
+						break;
+				}
+				
+				
+				
+				}
+				
+				
+				
 			}
 		}
+		
+		
+		
+		
+		
+		
 }
 

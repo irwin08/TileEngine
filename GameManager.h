@@ -41,6 +41,9 @@ class GameManager
 
 	private:
 		
+		
+		
+		
 		bool checkCollision(std::shared_ptr<Character>chr, bool player);
 		
 		SDL_Event e;
@@ -64,6 +67,8 @@ class GameManager
 		//number of characters in characters vector
 		int mCharNum;
 
+		std::vector<int> d2; //used as secondary direction if primary does not work
+		
 		std::vector<std::shared_ptr<Character>> bullets;
 		bool bulletStatus[100];
 		
