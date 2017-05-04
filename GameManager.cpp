@@ -750,8 +750,8 @@ void GameManager::autoMove()
 				{
 					case 0:
 						//up
-						if(d2 == -1 || d2 > 1)
-							d2 = 2;
+						if(d2[i] == -1 || d2[i] > 1)
+							d2[i] = 2;
 						t = map->getTileType(((characters[i]->mX/20)), ((characters[i]->mX/20)-1));
 						if(t == 3)
 						{
@@ -761,18 +761,18 @@ void GameManager::autoMove()
 							else
 							{
 								//check if left or right works then move
-								if(d2 == 2)
+								if(d2[i] == 2)
 								{
 									t = map->getTileType(((characters[i]->mX/20)-1), ((characters[i]->mX/20)));
 									if(t == 3)
 									{
-										if(!checkCollision(characters[i], false)
+										if(!checkCollision(characters[i], false))
 											characters[i]->moveLeft();
 									}
 									else
 									{
-										d2 = 3;
-										if(!checkCollision(characters[i], false)
+										d2[i] = 3;
+										if(!checkCollision(characters[i], false))
 											characters[i]->moveRight();
 									}
 								}
@@ -781,13 +781,13 @@ void GameManager::autoMove()
 									t = map->getTileType(((characters[i]->mX/20)+1), ((characters[i]->mX/20)));
 									if(t == 3)
 									{
-										if(!checkCollision(characters[i], false)
+										if(!checkCollision(characters[i], false))
 											characters[i]->moveRight();
 									}
 									else
 									{
-										d2 = 2;
-										if(!checkCollision(characters[i], false)
+										d2[i] = 2;
+										if(!checkCollision(characters[i], false))
 											characters[i]->moveLeft();
 									}
 								}
@@ -805,6 +805,36 @@ void GameManager::autoMove()
 							else
 							{
 								//check if left or right works then move
+								if(d2[i] == 2)
+								{
+									t = map->getTileType(((characters[i]->mX/20)-1), ((characters[i]->mX/20)));
+									if(t == 3)
+									{
+										if(!checkCollision(characters[i], false))
+											characters[i]->moveLeft();
+									}
+									else
+									{
+										d2[i] = 3;
+										if(!checkCollision(characters[i], false))
+											characters[i]->moveRight();
+									}
+								}
+								else
+								{
+									t = map->getTileType(((characters[i]->mX/20)+1), ((characters[i]->mX/20)));
+									if(t == 3)
+									{
+										if(!checkCollision(characters[i], false))
+											characters[i]->moveRight();
+									}
+									else
+									{
+										d2[i] = 2;
+										if(!checkCollision(characters[i], false))
+											characters[i]->moveLeft();
+									}
+								}
 							}
 						}
 						break;
@@ -818,6 +848,36 @@ void GameManager::autoMove()
 							else
 							{
 								//check if up or down works then move
+								if(d2[i] == 0)
+								{
+									t = map->getTileType(((characters[i]->mX/20)-1), ((characters[i]->mX/20)));
+									if(t == 3)
+									{
+										if(!checkCollision(characters[i], false))
+											characters[i]->moveLeft();
+									}
+									else
+									{
+										d2[i] = 1;
+										if(!checkCollision(characters[i], false))
+											characters[i]->moveRight();
+									}
+								}
+								else
+								{
+									t = map->getTileType(((characters[i]->mX/20)+1), ((characters[i]->mX/20)));
+									if(t == 3)
+									{
+										if(!checkCollision(characters[i], false))
+											characters[i]->moveRight();
+									}
+									else
+									{
+										d2[i] = 0;
+										if(!checkCollision(characters[i], false))
+											characters[i]->moveLeft();
+									}
+								}
 							}
 						}
 						break;
