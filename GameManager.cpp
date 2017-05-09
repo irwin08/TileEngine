@@ -50,7 +50,7 @@ GameManager::GameManager(SDL_Renderer *renderer)
 //function called to start game, contains game loop.
 void GameManager::Start()
 {
-	
+	d2.resize(mCharNum);
 	//sets frame rate.
 	const int FRAMES_PER_SECOND = 45;
 	
@@ -133,7 +133,7 @@ void GameManager::loadCharacters(char *playerName, char *fileName, int playerX, 
 			{
 				case 0:
 					characters[y].reset(new Character(each.c_str(), mRenderer, 20, 30));
-					d2[i] = -1;
+					//d2[i] = -1;
 					break;
 				case 1:
 					characters[y]->name = each;
@@ -694,6 +694,9 @@ void GameManager::autoMove()
 					//note for next day - pathfinding is almost done, just needs to be
 					//implemented for left and right in addition to up and down.
 					
+					
+					
+					
 					// up = 0, down = 1, left = 2, right = 3
 					int direction;
 				
@@ -727,6 +730,7 @@ void GameManager::autoMove()
 						{
 							//definitely move left
 							direction = 2;
+							std::cout << "Move left" << std::endl;
 						}
 						else
 						{
@@ -735,11 +739,13 @@ void GameManager::autoMove()
 							{
 								//move up
 								direction = 0;
+								std::cout << "Move up" << std::endl;
 							}
 							else
 							{
 								//move down
 								direction = 1;
+								std::cout << "Move down" << std::endl;
 							}
 						}
 					}
@@ -926,6 +932,7 @@ void GameManager::autoMove()
 								}
 							}
 							break;
+							
 					}
 				}	
 			}
