@@ -89,19 +89,4 @@ void Character::jump(int value)
 	jumpValue = value;
 }
 
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+

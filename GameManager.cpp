@@ -156,6 +156,8 @@ void GameManager::loadCharacters(char *playerName, char *fileName, int playerX, 
 						characters[y]->autoMoveIndex = 0;
 					}
 				case 5:
+					//-48 comes from ascii. Numbers start at 48 in ascii table,
+					//so subtracting 48 from a char should give us the actual number
 					//if hostile set to move towards player
 					if(((int)each[0]-48) == 0)
 					{
@@ -571,55 +573,55 @@ void GameManager::autoMove()
 		{
 			if(characters[i]->autoMoveIndex != -1)
 			{
-			switch(characters[i]->autoMoveRoute[characters[i]->autoMoveIndex])
-			{
-				case 0:
-					//left
-					if(!checkCollision(characters[i], false))
-						characters[i]->moveLeft();
-					else
-					{
-						characters[i]->autoMoveIndex -= 2;
-						characters[i]->moveRight();
-					}
-					break;
-				case 1:
-					//up
-					if(!checkCollision(characters[i], false))
-						characters[i]->moveUp();
-					else
-					{
-						characters[i]->autoMoveIndex -= 2;
-						characters[i]->moveDown();
-						
-					}
-					break;
-				case 2:
-					//right
-					if(!checkCollision(characters[i], false))
-						characters[i]->moveRight();
-					else
-					{
-						characters[i]->autoMoveIndex -= 2;
-						characters[i]->moveLeft();
-					}
-					break;
-				case 3:
-					//down
-					if(!checkCollision(characters[i], false))
-					{
-						characters[i]->moveDown();
-					}
-					else
-					{
-						characters[i]->autoMoveIndex -= 2;
-						characters[i]->moveUp();				
-					}
-					break;
-			}
-			characters[i]->autoMoveIndex++;
-			if(characters[i]->autoMoveIndex >= characters[i]->autoMoveRoute.size())
-				characters[i]->autoMoveIndex = 0;
+				switch(characters[i]->autoMoveRoute[characters[i]->autoMoveIndex])
+				{
+					case 0:
+						//left
+						if(!checkCollision(characters[i], false))
+							characters[i]->moveLeft();
+						else
+						{
+							characters[i]->autoMoveIndex -= 2;
+							characters[i]->moveRight();
+						}
+						break;
+					case 1:
+						//up
+						if(!checkCollision(characters[i], false))
+							characters[i]->moveUp();
+						else
+						{
+							characters[i]->autoMoveIndex -= 2;
+							characters[i]->moveDown();
+							
+						}
+						break;
+					case 2:
+						//right
+						if(!checkCollision(characters[i], false))
+							characters[i]->moveRight();
+						else
+						{
+							characters[i]->autoMoveIndex -= 2;
+							characters[i]->moveLeft();
+						}
+						break;
+					case 3:
+						//down
+						if(!checkCollision(characters[i], false))
+						{
+							characters[i]->moveDown();
+						}
+						else
+						{
+							characters[i]->autoMoveIndex -= 2;
+							characters[i]->moveUp();				
+						}
+						break;
+				}
+				characters[i]->autoMoveIndex++;
+				if(characters[i]->autoMoveIndex >= characters[i]->autoMoveRoute.size())
+					characters[i]->autoMoveIndex = 0;
 			}
 			
 			//handle player hostile
@@ -630,134 +632,135 @@ void GameManager::autoMove()
 			{
 				if((abs(characters[i]->mX - (player->mX + cameraX)) < 200))
 				{
-				/*
-				if(characters[i]->mX > (player->mX + cameraX))
-				{
-					if(!checkCollision(characters[i], false))
+					/*
+					if(characters[i]->mX > (player->mX + cameraX))
 					{
-						characters[i]->moveLeft();
-						if(characters[i]>0)
-							characters[i]->left--;
-					}
-					else
-					{
-						characters[i]->left+=2;
-						characters[i]->moveRight();
-						
-						if(characters[i]->left > 3)
+						if(!checkCollision(characters[i], false))
 						{
-							if(characters[i]->up > 3)
+							characters[i]->moveLeft();
+							if(characters[i]>0)
+								characters[i]->left--;
+						}
+						else
+						{
+							characters[i]->left+=2;
+							characters[i]->moveRight();
+							
+							if(characters[i]->left > 3)
 							{
-								characters[i]->moveDown();
+								if(characters[i]->up > 3)
+								{
+									characters[i]->moveDown();
+								}
+								else
+								{
+									//up
+									characters[i]->moveUp();
+								}
+							}
+						}
+					}
+					if(characters[i]->mY > (player->mY + cameraY))
+					{
+						if(!checkCollision(characters[i], false))
+							characters[i]->moveUp();
+						else
+						{
+							characters[i]->moveDown();
+						}
+					}
+					if(characters[i]->mX < (player->mX + cameraX))
+					{
+						if(!checkCollision(characters[i], false))
+						characters[i]->moveRight();
+						else
+						{
+							characters[i]->moveLeft();
+						}
+					}
+					if(characters[i]->mY < (player->mY + cameraY))
+					{
+						if(!checkCollision(characters[i], false))
+							characters[i]->moveDown();
+						else
+						{
+							characters[i]->moveUp();
+						}
+					}
+					*/
+				
+					//hostility 2: pathfinding boogaloo
+					
+					//note for next day - pathfinding is almost done, just needs to be
+					//implemented for left and right in addition to up and down.
+					
+					// up = 0, down = 1, left = 2, right = 3
+					int direction;
+				
+					if(characters[i]->mX < (player->mX + cameraX))
+					{
+						//then character needs to move right
+						if(abs(characters[i]->mX - (player->mX + cameraX)) > abs(characters[i]->mY - (player->mX + cameraX)))
+						{
+							//definitely move right
+							direction = 3;
+						}
+						else
+						{
+							//move vertically
+							if(characters[i]->mY > (player->mY + cameraY))
+							{
+								//move up
+								direction = 0;
 							}
 							else
 							{
-								//up
-								characters[i]->moveUp();
+								//move down
+								direction = 1;
 							}
 						}
 					}
-				}
-				if(characters[i]->mY > (player->mY + cameraY))
-				{
-					if(!checkCollision(characters[i], false))
-						characters[i]->moveUp();
 					else
 					{
-						characters[i]->moveDown();
-					}
-				}
-				if(characters[i]->mX < (player->mX + cameraX))
-				{
-					if(!checkCollision(characters[i], false))
-						characters[i]->moveRight();
-					else
-					{
-						characters[i]->moveLeft();
-					}
-				}
-				if(characters[i]->mY < (player->mY + cameraY))
-				{
-					if(!checkCollision(characters[i], false))
-						characters[i]->moveDown();
-					else
-					{
-						characters[i]->moveUp();
-					}
-				}
-				*/
-				
-				//hostility 2: pathfinding boogaloo
-				
-				//note for next day - pathfinding is almost done, just needs to be
-				//implemented for left and right in addition to up and down.
-				
-				// up = 0, down = 1, left = 2, right = 3
-				int direction;
-				
-				if(characters[i]->mX < (player->mX + cameraX))
-				{
-					//then character needs to move right
-					if(abs(characters[i]->mX - (player->mX + cameraX)) > abs(characters[i]->mY - (player->mX + cameraX)))
-					{
-						//definitely move right
-						direction = 3;
-					}
-					else
-					{
-						//move vertically
-						if(characters[i]->mY > (player->mY + cameraY))
+						//then character needs to move left
+						if(abs(characters[i]->mX - (player->mX + cameraX)) > abs(characters[i]->mY - (player->mX + cameraX)))
 						{
-							//move up
-							direction = 0;
+							//definitely move left
+							direction = 2;
 						}
 						else
 						{
-							//move down
-							direction = 1;
+							//move vertically
+							if(characters[i]->mY > (player->mY + cameraY))
+							{
+								//move up
+								direction = 0;
+							}
+							else
+							{
+								//move down
+								direction = 1;
+							}
 						}
 					}
-				}
-				else
-				{
-					//then character needs to move left
-					if(abs(characters[i]->mX - (player->mX + cameraX)) > abs(characters[i]->mY - (player->mX + cameraX)))
+				
+					//direction determined
+					
+					int t;
+				
+					switch(direction)
 					{
-						//definitely move left
-						direction = 2;
-					}
-					else
-					{
-						//move vertically
-						if(characters[i]->mY > (player->mY + cameraY))
-						{
-							//move up
-							direction = 0;
-						}
-						else
-						{
-							//move down
-							direction = 1;
-						}
-					}
-				}
-				
-				//direction determined
-				
-				int t;
-				
-				switch(direction)
-				{
-					case 0:
-						//up
-						if(d2[i] == -1 || d2[i] > 1)
-							d2[i] = 2;
-						t = map->getTileType(((characters[i]->mX/20)), ((characters[i]->mX/20)-1));
-						if(t == 3)
-						{
-							//tiles all clear!
-							if(!checkCollision(characters[i], false))
-								characters[i]->moveUp();
+						case 0:
+							//up
+							if(d2[i] == -1 || d2[i] > 1)
+								d2[i] = 2;
+							t = map->getTileType(((characters[i]->mX/20)), ((characters[i]->mX/20)-1));
+							if(t == 3)
+							{
+								//tiles all clear!
+								if(!checkCollision(characters[i], false))
+									characters[i]->moveUp();
+							}
 							else
 							{
 								//check if left or right works then move
@@ -792,16 +795,16 @@ void GameManager::autoMove()
 									}
 								}
 							}
-						}
 						
-						break;
-					case 1:
-						//down
-						t = map->getTileType(((characters[i]->mX/20)), ((characters[i]->mX/20)+1));
-						if(t == 3)
-						{
-							if(!checkCollision(characters[i], false))
-								characters[i]->moveDown();
+							break;
+						case 1:
+							//down
+							t = map->getTileType(((characters[i]->mX/20)), ((characters[i]->mX/20)+1));
+							if(t == 3)
+							{
+								if(!checkCollision(characters[i], false))
+									characters[i]->moveDown();	
+							}
 							else
 							{
 								//check if left or right works then move
@@ -836,21 +839,64 @@ void GameManager::autoMove()
 									}
 								}
 							}
-						}
-						break;
-					case 2:
-						//left
-						t = map->getTileType(((characters[i]->mX/20)-1), ((characters[i]->mX/20)));
-						if(t == 3)
-						{
-							if(!checkCollision(characters[i], false))
-								characters[i]->moveLeft();
+							break;
+						case 2:
+							//left
+							t = map->getTileType(((characters[i]->mX/20)-1), ((characters[i]->mX/20)));
+							if(t == 3)
+							{
+								if(!checkCollision(characters[i], false))
+									characters[i]->moveLeft();
+							}
 							else
 							{
 								//check if up or down works then move
 								if(d2[i] == 0)
 								{
-									t = map->getTileType(((characters[i]->mX/20)-1), ((characters[i]->mX/20)));
+									t = map->getTileType(((characters[i]->mX/20)), ((characters[i]->mX/20)-1));
+									if(t == 3)
+									{
+										if(!checkCollision(characters[i], false))
+											characters[i]->moveUp();
+									}
+									else
+									{
+										d2[i] = 1;
+										if(!checkCollision(characters[i], false))
+											characters[i]->moveDown();
+									}
+								}
+								else
+								{
+									t = map->getTileType(((characters[i]->mX/20)), ((characters[i]->mX/20)+1));
+									if(t == 3)
+									{
+										if(!checkCollision(characters[i], false))
+											characters[i]->moveDown();
+									}
+									else
+									{
+										d2[i] = 0;
+										if(!checkCollision(characters[i], false))
+											characters[i]->moveUp();
+									}
+								}
+							}
+							break;
+						case 3:
+							//right
+							t = map->getTileType(((characters[i]->mX/20)+1), ((characters[i]->mX/20)));
+							if(t == 3)
+							{
+								if(!checkCollision(characters[i], false))
+									characters[i]->moveDown();
+							}
+							else
+							{
+								//check if up or down works then move
+								if(d2[i] == 2)
+								{
+									t = map->getTileType(((characters[i]->mX/20)), ((characters[i]->mX/20)-1));
 									if(t == 3)
 									{
 										if(!checkCollision(characters[i], false))
@@ -858,14 +904,14 @@ void GameManager::autoMove()
 									}
 									else
 									{
-										d2[i] = 1;
+										d2[i] = 3;
 										if(!checkCollision(characters[i], false))
 											characters[i]->moveRight();
 									}
 								}
 								else
 								{
-									t = map->getTileType(((characters[i]->mX/20)+1), ((characters[i]->mX/20)));
+									t = map->getTileType(((characters[i]->mX/20)), ((characters[i]->mX/20)+1));
 									if(t == 3)
 									{
 										if(!checkCollision(characters[i], false))
@@ -873,42 +919,17 @@ void GameManager::autoMove()
 									}
 									else
 									{
-										d2[i] = 0;
+										d2[i] = 2;
 										if(!checkCollision(characters[i], false))
 											characters[i]->moveLeft();
 									}
 								}
 							}
-						}
-						break;
-					case 3:
-						//right
-						t = map->getTileType(((characters[i]->mX/20)+1), ((characters[i]->mX/20)));
-						if(t == 3)
-						{
-							if(!checkCollision(characters[i], false))
-								characters[i]->moveDown();
-							else
-							{
-								//check if up or down works then move
-							}
-						}
-						break;
-				}
-				
-				
-				
-				}
-				
-				
-				
+							break;
+					}
+				}	
 			}
 		}
-		
-		
-		
-		
-		
-		
 }
+
 

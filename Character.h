@@ -72,3 +72,5 @@ class Character
 		void loadTexture(const char *path);
 	
 };
+
+

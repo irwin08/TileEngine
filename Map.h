@@ -49,5 +49,6 @@ class Map
 		std::string mFilePath;
 		
 		std::vector< std::vector<std::shared_ptr<Tile>> > tiles;
-		//std::array<std::array<std::shared_ptr<Tile>, 10>, 10> tiles;
 };
+
+

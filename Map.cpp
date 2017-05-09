@@ -38,14 +38,6 @@ Map::Map(SDL_Renderer *gRenderer, int x, int y, const char *filePath, bool edit,
 
 void Map::render(SDL_Renderer *gRenderer, int x, int y)
 {
-	/*if(x < 0)
-		x = 0;
-	else if(x > mX)
-		x = mX;
-	if(y < 0)
-		y = 0;
-	else if(y > mY)
-		y = 0;*/
 	//since camerax and cameray are incrementing by 5, we have to divide by 5
 	
 	//topLeftX = x/20
@@ -65,14 +57,6 @@ void Map::render(SDL_Renderer *gRenderer, int x, int y)
 
 void Map::renderOffset(SDL_Renderer *gRenderer, int x, int y, int m, int n)
 {
-	/*if(x < 0)
-		x = 0;
-	else if(x > mX)
-		x = mX;
-	if(y < 0)
-		y = 0;
-	else if(y > mY)
-		y = 0;*/
 	//since camerax and cameray are incrementing by 5, we have to divide by 5
 	
 	//topLeftX = x/20
@@ -192,5 +176,4 @@ SDL_Texture *Map::loadTexture(char *path, SDL_Renderer *mRenderer)
 }
 
 	
-
 	

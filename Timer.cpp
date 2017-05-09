@@ -68,3 +68,5 @@ bool Timer::is_paused()
 {
 	return paused;
 }
+
+

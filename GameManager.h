@@ -75,3 +75,5 @@ class GameManager
 		//pointer to the renderer
 		SDL_Renderer *mRenderer;
 };
+
+

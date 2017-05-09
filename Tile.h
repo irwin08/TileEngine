@@ -27,3 +27,5 @@ class Tile
 		SDL_Texture *loadTexture(char *path);
 		
 };
+
+
